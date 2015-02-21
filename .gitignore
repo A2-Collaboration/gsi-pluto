@@ -1,0 +1,11 @@
+/libPluto.so
+/libPluto.a
+/Plugins.h
+/Plugins.cc
+/PluginLinkdef.h
+/Compiled.h
+/.depend
+/lib
+*.swp
+*.autosave
+*~
