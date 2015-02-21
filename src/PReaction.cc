@@ -28,6 +28,8 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
+#include "TRandom2.h"
+
 const char *EType[4] = {
     "PReaction: ok",
     "PReaction: invalid option (must be 0 or 1)",
@@ -152,10 +154,6 @@ PReaction:: PReaction() {
     nchan=0;
     SetUp(NULL);
     SetName(NULL);
-
-    event_counter=-1;
-    event_rndid=-1;
-    rng.SetSeed();
 
 }
 
@@ -1020,6 +1018,12 @@ void PReaction::InitLoop() {
 }
 
 int PReaction::Loop(int nevents, int wf, int verbose) {
+
+    // Init Random IDs
+    event_counter=-1;
+    event_rndid=-1;
+    rng.SetSeed();
+
     // Simulate "nevents" events
 
     // double initialWeight = 1.;
@@ -1116,6 +1120,7 @@ int PReaction::Loop(int nevents, int wf, int verbose) {
     if (verbose) printf("%s\n",RMessage[1]); //calculating widths in PData...
 
     makeDistributionManager()->Startup();
+
 
     for (i=0;(i<nevents) || (nevents<0);++i) {                // number of events to generate
 

@@ -19,7 +19,7 @@
 #include "PBulkInterface.h"
 #include "PProjector.h"
 #include "PPlutoBulkDecay.h"
-#include "TRandom1.h"
+#include "TRandom2.h"
 
 #define MAX_FILEOUTPUT 5
 
@@ -426,7 +426,7 @@ class PReaction : public TObject  {
     Long64_t event_counter;
     Long64_t event_rndid;
 
-    TRandom1 rng;
+    TRandom2 rng;
 
 
     Int_t pre_heating;
