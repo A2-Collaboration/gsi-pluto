@@ -9,3 +9,10 @@
 *.swp
 *.autosave
 *~
+
+
+#qtcreator
+Pluto.config
+Pluto.creator
+Pluto.files
+Pluto.includes
