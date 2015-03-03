@@ -27,6 +27,7 @@ class PReaction;
 class PChannel;
 class PParticle;
 class TPythia6;
+class PDecayChannel;
 
 #include "PDistributionManager.h"
 #include "PReaction.h"
