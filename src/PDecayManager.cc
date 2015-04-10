@@ -539,7 +539,7 @@ PReaction* PDecayManager::GetNextReaction(int wf, char* name,  int f0,
     if (verbose) cout << "Selecting next reaction:" << endl;
     if (ListForReaction) delete [] ListForReaction;
   
-    if (CurrentReaction) delete CurrentReaction;
+//    if (CurrentReaction) delete CurrentReaction;
   
     if (!ReactionList) {
 	if (verbose) cout << " No initialization done." << endl;
