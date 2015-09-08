@@ -198,7 +198,7 @@ Bool_t PEtaDecaysPlugin::ExecCommand(const char * command, Double_t value) {
 	ipid[3]=makeStaticData()->GetParticleID("pi+");
 	ipid[4]=makeStaticData()->GetParticleID("pi-");
 	
-	if (makeStaticData()->GetDecayKey(ipid, 4) < 0)
+	if (makeStaticData()->GetDecayKey(ipid, 4) < 0)   // <====== this decay is broken!!!!!!!!!!!!!!!!!!
 	    makeStaticData()->AddDecay(-1,"eta -> e+ + e- + pi+ + pi-", 
 				       "eta", "e+,e-,pi+,pi-",ETA_EE_PIPI_BR);
 

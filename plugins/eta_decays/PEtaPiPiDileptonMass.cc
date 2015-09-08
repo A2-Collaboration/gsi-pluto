@@ -22,11 +22,13 @@ using namespace std;
 ClassImp(PEtaPiPiDileptonMass)
 
 PEtaPiPiDileptonMass::PEtaPiPiDileptonMass()  {
+    vmd_formfactor_model=NULL;
 } ;
 
 PEtaPiPiDileptonMass::PEtaPiPiDileptonMass(const Char_t *id, const Char_t *de, Int_t key) :
     PChannelModel(id, de,key) {
 
+    vmd_formfactor_model=NULL;
     if (is_channel<0)
 	Warning("PEtaPiPiDileptonMass","This model should be bound to CHANNELS only");
 
