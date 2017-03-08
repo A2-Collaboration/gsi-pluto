@@ -29,6 +29,8 @@ const long double hbar=6.582122e-25; // units of (GeV s)
 #include "PUtils.h"                               // utilities class
 #include "TF2.h"
 
+int pluto_global::verbosity = 0;
+
 #if 0
 int PData::useQED=0;        <--- USED???                      // 1 = QED form factors, 0 = VDM (default)
 int PData::flatMD=0;        <--- USED???                      // 1 = flat Dalitz mass sampling, 0 = normal

@@ -7,6 +7,8 @@
 #define _PDATA_H_
 
 
+// global verbosity level
+#include "Pglobal.h"
 
 #include "TROOT.h"
 #include "TMath.h"
