@@ -527,7 +527,6 @@ PReaction:: ~PReaction() {
 
 
 PParticle *PReaction::MakeParticle(char * name) {
-    //    cout << name << endl;
     int is_spec =-1;
     int len = strlen(name)-1;
     if ((name[0]=='(') && (name[len]==')'))  { 
@@ -683,8 +682,6 @@ void PReaction::SetReactionId() {
 
 void PReaction:: SetUp(PChannel **pchannel) {
     // get the channels and particles, identify the physics, set up the defaults.
-
-//    cout << "PReaction:: setUp called" << endl;
     
     int j, i, cnew, l=-1, m=-1, k, pcount;
 
@@ -797,9 +794,7 @@ void PReaction:: SetUp(PChannel **pchannel) {
 	nclones = ndpar + 1;                    // initialize number of clones for root tree
   
     for (j=0;j<nchan;++j) {
-	if (makeDistributionManager()->from_pdecaymanager == 0) {
-//	  cout << "ataching " << j << endl;
-//	    channel[j]->Print();
+    if (makeDistributionManager()->from_pdecaymanager == 0) {
 	    makeDistributionManager()->Attach(channel[j]); 
 
 	} //if no DecayManager, do this by hand
@@ -856,17 +851,11 @@ void PReaction:: SetUp(PChannel **pchannel) {
     }
     ntpar = l+1;
 
-    //PParticle* pParent=NULL;
-
     if (nchan>0) SetReactionId();
     else nclones=0;
 
     for (j=0; j<nclones; j++) {
-//	particle[j]->Print();
 
-	//pParent = particle[j]->GetParent();
-	//if (pParent==NULL) cout << "ids= " << particle[j]->ID() << endl;
-	//else cout << "ids= " << particle[j]->ID() <<" " << pParent->ID()<< endl;
 	particle[j]->SetIndex(j);             // set index in array
 	particle[j]->SetParentIndex(-1);      // parent not known yet
 	particle[j]->SetDaughterIndex(-1);    // daughter(s) not known yet
@@ -994,8 +983,7 @@ void PReaction::InitLoop() {
     
     if (primary_key>-1)
 	while (makeDataBase()->MakeListIterator(primary_key, NBATCH_NAME, LBATCH_NAME,
-						&listkey)) {
-	    //cout << makeDataBase()->GetName(listkey);
+                        &listkey)) {
 	    if ((*makeDataBase()->GetName(listkey) == '#') && 
 		PUtils::ValidVariableName(makeDataBase()->GetName(listkey))) {
 		//Filter found
@@ -1225,16 +1213,13 @@ int PReaction::Loop(int nevents, int wf, int verbose) {
 
 ////////////////////////    End of Prologue  ////////////////////////////
 
-	//cout << "prosize " << size << endl;
-
 	//Loop over all Particles and set the initial weight
 	//This includes the particles from the prologue
 	for (int ii=0;ii<size;ii++) {
 	    if (*weight_version) 
 		particle_stack[ii]->SetW(PChannel::GetGlobalWeight() 
 					 *particle_stack[ii]->GetMultiplicity());
-	    particle_stack[ii]->SetStatus(STATUS_NOT_DECAYED);
-	    //cout << "set particle " << ii << " active" << endl;
+        particle_stack[ii]->SetStatus(STATUS_NOT_DECAYED);
 	    particle_stack[ii]->SetActive(); //active by default, otherwise it is 
 	    //un-initialized in PChannel::decay()
 	}
@@ -1254,8 +1239,8 @@ int PReaction::Loop(int nevents, int wf, int verbose) {
 
 	if (error_count_failed > max_failed_events-0.5) {
 	    status=3;
-	    Error("Loop", "Stalled in one single event (_system_max_failed_events reached). Giving up....");
-	    Info("Loop", "Last error code was: %i", ret);	    
+        Error("Loop", "Stalled in one single event (_system_max_failed_events reached). Giving up....");
+        Info("Loop", "Last error code was: %i", ret);
 	    break;
 	}
 
@@ -1268,8 +1253,7 @@ int PReaction::Loop(int nevents, int wf, int verbose) {
 		error_count_array[ret]++;
 
 		if (ret!=8) {
-		    last_nonempty = i;
-		    //cout << "goto repeat, code=" << ret << ", event nr=" << *events << endl;
+            last_nonempty = i;
 		    goto repeat;            // FAILED, repeat event
 		}
 
@@ -1283,8 +1267,7 @@ int PReaction::Loop(int nevents, int wf, int verbose) {
 	error_count_failed = 0;
 
 	for (j=0;j<nchan;++j) {
-	  if (channel[j]->GetNumNotFinalized()) {
-	      // cout << channel[j]->GetNumNotFinalized() << endl;
+      if (channel[j]->GetNumNotFinalized()) {
 	    for (int k=0; k < channel[j]->GetNumNotFinalized(); k++) {
 	      if (!channel[j]->GetDistributionNotFinalized(k)->EndOfChain()) {
 		  //		start=j;
@@ -1314,8 +1297,7 @@ int PReaction::Loop(int nevents, int wf, int verbose) {
 	    //Now starting to combine the individual weights
 	    //to (at least) a chain weight
 	    for (k=0;k<size;k++) { 
-		particle_stack[k]->weight_divisor=1.;
-		//cout << particle_stack[k]->W() << endl;
+        particle_stack[k]->weight_divisor=1.;
 	    }
 	    
 	    //Step1: Collect the divisors 
@@ -1353,9 +1335,7 @@ int PReaction::Loop(int nevents, int wf, int verbose) {
 		} else //adam
 		    my_global_weight *= particle_stack[k]->W();
 	    }
-	    
-	    //cout << "W: "<< my_global_weight << endl;
-	    
+
 	    //Step5: (optional)
 	    //Here, we give all particles the same weight (=event weight)
 	    //BUGBUG: Problem when we have different chains and the default weight
@@ -1403,13 +1383,11 @@ int PReaction::Loop(int nevents, int wf, int verbose) {
 	}
 
 	for (int bu =0; bu < bulkdecay_pos ; bu++) {
-	    int old_size=size;
-	    //cout << "size is: " << size << endl;
+        int old_size=size;
 	    //BUGBUG: Preliminary (see above)
 	    bulk[bu]->SetWeight(my_global_weight);
 //  	    for (k=0;k<size;++k) {
 // 		particle_stack[k]->Print();
-//  		//cout << "act: " << particle_stack[k]->IsActive() << endl;
 // 	    }
 
 //	    bulk[bu]->Print();
@@ -1427,8 +1405,7 @@ int PReaction::Loop(int nevents, int wf, int verbose) {
 	    }
 	    for (int ii=0;ii<size;ii++) {
 		//check for decayed particles and set them inactive
-		if (!allPARTICLES && decay_done[ii]) {		   
-		    //cout << "remove particle " << ii << endl;
+        if (!allPARTICLES && decay_done[ii]) {
 		    particle_stack[ii]->SetInActive();  // decayed particle
 		}
 	    }
@@ -1453,9 +1430,7 @@ int PReaction::Loop(int nevents, int wf, int verbose) {
 	}
     
 	Int_t cnt0 = 0;         // check for empty event
-	for (k=0;k<size;++k) {
-//     	    cout << "act: " << particle_stack[k]->IsActive() << "done: " <<decay_done[k]<< 
-//     		":" << particle_stack[k]->ID() << endl;
+    for (k=0;k<size;++k) {
 	    if (particle_stack[k]->IsActive()==kTRUE) cnt0++;
 	}
 	if (cnt0==0 && nchan != 0) {
@@ -1573,10 +1548,7 @@ int PReaction::Loop(int nevents, int wf, int verbose) {
 ///////////////////////////    Analyze #filters ////////////////////////////////
 
 	Int_t filters_sum=0;
-	for (k=0; k<num_filters;k++) {
-	    //	    cout << makeDataBase()->GetName(filter_keys[k]) << ":" << 
-	    //		*(filter_values[k]) << endl;
-	    
+    for (k=0; k<num_filters;k++) {
 	    if (*(filter_values[k])<PUtils::sampleFlat()) {
 		//Random variable failed
 		filter_counter[k]++;
@@ -1601,8 +1573,7 @@ int PReaction::Loop(int nevents, int wf, int verbose) {
 	for (k=0;k<size;k++) {  // loop over all particles
 	    if (!decay_done[k]) {
 		stable_particle[size_tracked]=particle_stack[k];
-		size_tracked++;
-//		cout << "found stable: " << particle_stack[k]->ID() << endl;
+        size_tracked++;
 	    }
 	}
 
@@ -1761,9 +1732,7 @@ int PReaction::Loop(int nevents, int wf, int verbose) {
 		pclone=evt[i+1];
 		pclone->Delete();
 		for (k=0;k<(current_size_branches[i]);k++) { 
-		    (*pclone)[k] = new((*pclone)[k]) PParticle(*(p_array_branches[i*stacksize + k]));
-		    //(p_array_branches[i*stacksize + k])->Print();
-		    //cout << i << ":" << k << ":" <<  p_array_branches[i*stacksize + k] << endl;
+            (*pclone)[k] = new((*pclone)[k]) PParticle(*(p_array_branches[i*stacksize + k]));
 		}
 	    }
 

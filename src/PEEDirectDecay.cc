@@ -101,73 +101,73 @@ Bool_t PEEDirectDecay::SampleMass(Double_t *mass, Int_t *didx) {
 Bool_t PEEDirectDecay::GetWidth(Double_t mass, Double_t *width, Int_t didx) {
 
     if (makeStaticData()->GetPWidx(is_channel)==-1) {
-	*width = makeStaticData()->GetDecayPartialWidth(is_channel);
-	return kFALSE;
+        *width = makeStaticData()->GetDecayPartialWidth(is_channel);
+        return kFALSE;
     }
 
     if (!makeStaticData()->GetPWidx(is_channel) || width_init == 0) { // Enter below only on the first call
 #ifdef INGO_DEBUG
 	Info("GetWidth","Creating mesh in %s",makeStaticData()-> GetDecayName(is_channel));
 #endif
-	width_init++;
-	makeDynamicData()->GetParticleDepth(parent_id); // if 1st call will initialize flags
+        width_init++;
+        makeDynamicData()->GetParticleDepth(parent_id); // if 1st call will initialize flags
 
-	mmin=makeStaticData()->GetDecayEmin(is_channel);  // mass threshold for the decay
-	
-	mmax=PData::UMass(parent_id);                // mass ceiling
-	Double_t dm=(mmax-mmin)/(maxmesh-3.);          // mass increment
-    
-	mesh = new PMesh(maxmesh-2,"mesh");
-	for (int i=0;i<maxmesh-2;++i) {
-	    Double_t mm=mmin+i*dm;   // current invariant mass of the parent resonance
+        mmin=makeStaticData()->GetDecayEmin(is_channel);  // mass threshold for the decay
 
-	    Double_t temp0 = 0.;
+        mmax=PData::UMass(parent_id);                // mass ceiling
+        Double_t dm=(mmax-mmin)/(maxmesh-3.);          // mass increment
 
-	    //--------------------
-	    double me=2.*mlep*mlep;
+        mesh = new PMesh(maxmesh-2,"mesh");
+        for (int i=0;i<maxmesh-2;++i) {
+            Double_t mm=mmin+i*dm;   // current invariant mass of the parent resonance
 
-	    double m2=mm*mm, m3=m2*mm, mem=me/m2;
-	    double wid = 0;
-	    if ((1.-2.*mem)>0)
-		wid = cv*sqrt(1.-2.*mem)*(1.+mem)/m3;
-	    
-	    //pipi cutoff
-	    
-	    double pi2phase = 1;
+            Double_t temp0 = 0.;
 
-	    if ((use_pi_cutoff == 1)) 
-		pi2phase =  PKinematics::pcms(mm,makeStaticData()->GetParticleMass("pi+"),
-					      makeStaticData()->GetParticleMass("pi-"));	  
-	    
-	    pi2phase = mm > 2*makeStaticData()->GetParticleMass("pi+") ? pi2phase : 0;
+            //--------------------
+            double me=2.*mlep*mlep;
 
-	    if ((wid>0) && (use_pi_cutoff)) {
-		temp0= wid*pow(pi2phase,3./2.) ;
-	    } else if ((wid>0) && (use_hadronic_ps)) {
-		Double_t pole_width = 
-		    makeDynamicData()
-		    ->GetParticleTotalWidthSum(makeStaticData()->GetParticleMass(parent_id),parent_id,1);
-		Double_t mass_width = 
-		    makeDynamicData()->GetParticleTotalWidthSum(mm,parent_id,1);
-		
-		temp0= wid*(mass_width/pole_width);
-	    } else if (wid>0) {
-		temp0= wid;
-	    } else temp0=0;
-	    
-	    //--------------------
+            double m2=mm*mm, m3=m2*mm, mem=me/m2;
+            double wid = 0;
+            if ((1.-2.*mem)>0)
+                wid = cv*sqrt(1.-2.*mem)*(1.+mem)/m3;
 
-	    mesh->SetNode(i,temp0); 
-	}
+            //pipi cutoff
 
-	mesh->SetMin(mmin);                 // store mass threshold
-	mesh->SetMax(mmax);                 // store mass ceiling
-	makeStaticData()->SetPWidx(is_channel,1);  //Enable channel
+            double pi2phase = 1;
+
+            if ((use_pi_cutoff == 1))
+                pi2phase =  PKinematics::pcms(mm,makeStaticData()->GetParticleMass("pi+"),
+                                              makeStaticData()->GetParticleMass("pi-"));
+
+            pi2phase = mm > 2*makeStaticData()->GetParticleMass("pi+") ? pi2phase : 0;
+
+            if ((wid>0) && (use_pi_cutoff)) {
+                temp0= wid*pow(pi2phase,3./2.) ;
+            } else if ((wid>0) && (use_hadronic_ps)) {
+                Double_t pole_width =
+                        makeDynamicData()
+                        ->GetParticleTotalWidthSum(makeStaticData()->GetParticleMass(parent_id),parent_id,1);
+                Double_t mass_width =
+                        makeDynamicData()->GetParticleTotalWidthSum(mm,parent_id,1);
+
+                temp0= wid*(mass_width/pole_width);
+            } else if (wid>0) {
+                temp0= wid;
+            } else temp0=0;
+
+            //--------------------
+
+            mesh->SetNode(i,temp0);
+        }
+
+        mesh->SetMin(mmin);                 // store mass threshold
+        mesh->SetMax(mmax);                 // store mass ceiling
+        makeStaticData()->SetPWidx(is_channel,1);  //Enable channel
     } //END first call
 
     if (mesh)  {
-	*width=mesh->GetLinearIP(mass);
-	return kTRUE;
+        *width=mesh->GetLinearIP(mass);
+        return kTRUE;
     }
     return kFALSE;
 }

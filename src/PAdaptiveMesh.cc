@@ -49,20 +49,16 @@ PAdaptiveMesh::~PAdaptiveMesh() {
 void PAdaptiveMesh::ReCalc() {
     
     if (sub_size) {
-	area_size=0;
-	for (int i=0;i<sub_size;i++) {
-	    sub_tree[i]->ReCalc();
-	    area_size+=sub_tree[i]->GetArea();
-	    sub_area[i]=area_size;
-
-	    //   cout << layer << ":"<<sub_tree[i]->GetArea() << ":" << sub_area[i] << endl;
-	}
+        area_size=0;
+        for (int i=0;i<sub_size;i++) {
+            sub_tree[i]->ReCalc();
+            area_size+=sub_tree[i]->GetArea();
+            sub_area[i]=area_size;
+        }
     } else {
-	area_size=(x_max-x_min)*y_max;
-	//cout << x_min << "," << x_max<< endl;
+        area_size=(x_max-x_min)*y_max;
     }
 
-    
 
 };
 
@@ -71,9 +67,7 @@ PAdaptiveMesh * PAdaptiveMesh::GetRandomBin(Double_t f_random) {
     if (!sub_size) return this;
     
     for (int i=0;i<sub_size;i++) {
-//	    cout << total_sub_size << endl;
-	if (f_random < sub_area[i]) {
-//		cout << "b" << endl;
+    if (f_random < sub_area[i]) {
 	    if (i) return sub_tree[i]->GetRandomBin(f_random - sub_area[i-1]);
 	    return sub_tree[i]->GetRandomBin(f_random);
 
@@ -100,8 +94,6 @@ Double_t PAdaptiveMesh::GetRandom() {
     
     Double_t y_random=tf1->Eval(x_random);
 
-    // cout << x_random << ":" << y_random << endl;
-
     if (y_random>bin->GetYMax()) {
 	//bin has a maximum larger then expected
 	//re-scale everything!
@@ -115,13 +107,9 @@ Double_t PAdaptiveMesh::GetRandom() {
     }
 
     if (y_random > (bin->GetYMax()*PUtils::sampleFlat())) {
-// cout << x_random <<endl;
+
 	return x_random;
     }
-    
-//    cout << x_random << ":" << bin->GetYMax() << ":" << bin->GetArea()  << endl;
-
-//    exit(1);
 
     goto repeat2;
 
@@ -149,8 +137,6 @@ void PAdaptiveMesh::Divide(Int_t num, Int_t my_layer) {
 	if (tf1->Eval(max)> ymax) ymax=tf1->Eval(max);
 
 	if (ymax<0) ymax=0;
-
-//	cout << "-->" << min << ":" << max << endl;
 
 	sub_tree[i]=new PAdaptiveMesh(min,max,ymax);
 	sub_tree[i]->SetTF1(tf1);

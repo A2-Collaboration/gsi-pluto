@@ -125,11 +125,7 @@ TGraph2D* PArray::GetTGraph2D(Int_t xcol, Int_t ycol) {
 
 	TGraph2D * delme = new TGraph2D(real_size_1d,vals_1d[xcol]->GetArray(),
 					vals_2d->GetArray(),vals_1d[ycol]->GetArray() );
-// 	for (int i=0;i<real_size_1d;i++)
-// 	    cout << (vals_1d[xcol]->GetArray())[i] << ":"
-// 		 << (vals_2d->GetArray())[i] << ":"
-// 		 << (vals_1d[ycol]->GetArray())[i] << ":"
-// 		 << endl;
+
 	return delme;
 
     }

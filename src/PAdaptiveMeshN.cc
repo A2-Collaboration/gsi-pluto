@@ -93,8 +93,6 @@ void PAdaptiveMeshN::SetDefaults(UInt_t my_pattern, Int_t my_max_dimensions,
 };
 
 PAdaptiveMeshN::~PAdaptiveMeshN() {
-    
-    // cout << "delete mesh" << endl;
 
 };
 
@@ -105,8 +103,7 @@ void PAdaptiveMeshN::ReCalc() {
 
 	sub_tree[i].ReCalc();
 	area_size+=sub_tree[i].GetArea();
-	sub_area[i]=area_size;	
-	//cout << layer << ":"<<sub_tree[i].GetArea() << ":" << sub_area[i] << endl;
+    sub_area[i]=area_size;
     }
 
     if (!area_size) {
@@ -114,8 +111,7 @@ void PAdaptiveMeshN::ReCalc() {
 	for (int i=0;i<num_dimensions;i++) {    
 	    if (((pattern >> i) & 0x1) == 0x1) { 
 		area_size*=(x_max[i]-x_min[i]);
-	    }
-	    //cout << x_min << "," << x_max<< endl;
+        }
 	}
     }
 
@@ -126,9 +122,7 @@ PAdaptiveMeshN * PAdaptiveMeshN::GetRandomBin(Double_t f_random) {
     if (!total_sub_size) return this;
     
     for (int i=0;i<total_sub_size;i++) {
-	//	    cout << total_sub_size << endl;
-	if (f_random < sub_area[i]) {
-//		cout << "b" << endl;
+    if (f_random < sub_area[i]) {
 	    if (i) return sub_tree[i].GetRandomBin(f_random - sub_area[i-1]);
 	    return sub_tree[i].GetRandomBin(f_random);
 
@@ -149,11 +143,7 @@ Bool_t PAdaptiveMeshN::GetRandom() {
     timer.Start();
  
  repeat2:
-    //num=0;
-    //cout << "a" << endl;
     PAdaptiveMeshN * bin=GetRandomBin(PUtils::sampleFlat()*area_size);
-    //PAdaptiveMeshN * bin=GetRandomBin(0.);
-    //cout << "b" << endl;
  repeat3:
     num++;
 
@@ -169,13 +159,7 @@ Bool_t PAdaptiveMeshN::GetRandom() {
 
     return kTRUE;
 
-    // cout << array[0] << ":" << array[1] << endl;
-    //Double_t y_random = model->GetWeight(array);
     Double_t y_random = model->GetWeight(array);
-    //Double_t y_random = 0;
-    //y_random = 0;
-
-    //cout << y_random << "->" << bin->GetYMax() << endl;
 
     if (y_random>bin->GetYMax()) {
  	//bin has a maximum larger then expected
@@ -193,18 +177,9 @@ Bool_t PAdaptiveMeshN::GetRandom() {
     //if (num>10) return kTRUE;
 
     if (y_random > (bin->GetYMax()*PUtils::sampleFlat())) {
-// // cout << x_random <<endl;
-//	cout << "num: " << num << endl;
- 	return kTRUE;
+        return kTRUE;
     }
     
-//    cout << x_random << ":" << bin->GetYMax() << ":" << bin->GetArea()  << endl;
-
-//    exit(1);
-
-   
-    //printf("%f sec\n",timer.RealTime());timer.Continue();
-
     if (num<100) goto repeat3;
     goto repeat2;
 
@@ -225,8 +200,6 @@ void PAdaptiveMeshN::FixArray(void) {
 
 void PAdaptiveMeshN::Divide(Int_t num, Int_t my_layer) {
     if (is_divided) return; //already divided
-
-    // cout << "Divide" << endl;
 
     is_divided=1;
     total_sub_size=1;
@@ -252,8 +225,6 @@ void PAdaptiveMeshN::Divide(Int_t num, Int_t my_layer) {
     for (int i=0;i<num_dimensions;i++) {
 	if (((pattern >> i) & 0x1) == 0x1) { 
 	    //outer loop over variable dimensions
-	    
-	    //cout << "checking dim. " << i << endl;
 
 	    //now try to get all possible min/max combinations of the remaining
 	    //dimensions
@@ -271,8 +242,7 @@ void PAdaptiveMeshN::Divide(Int_t num, Int_t my_layer) {
 		    FixArray();
 		    for (int j=0;j<num_dimensions;j++) {
 			if ((((pattern >> j) & 0x1) == 0x1) && (i!=j)){
-			    
-			    //cout << "setting dim. " << j << endl;
+
 			    Int_t local_bit=(mm_pattern>>pattern_position) & 0x1;
 			    if (local_bit)
 				array[j]=x_min[j];
@@ -324,9 +294,6 @@ void PAdaptiveMeshN::Divide(Int_t num, Int_t my_layer) {
 	    if (max_atmin[i]) diff2 = min_atmax[i]/max_atmin[i];
 	    Double_t abs_diff2 = fabs(min_atmax[i]-max_atmin[i]);
 
- // 	    cout << diff1 << ":" << diff2 << ":" << abs_diff1
-//  		 << ":" << abs_diff2 << endl;
-
 	    if ((((diff1 > threshold_diff) || ((1./diff1)>threshold_diff)) &&
 		 (abs_diff1>threshold_abs)) ||
 		(((diff2 > threshold_diff) || ((1./diff2)>threshold_diff)) &&
@@ -349,8 +316,7 @@ void PAdaptiveMeshN::Divide(Int_t num, Int_t my_layer) {
 
     for (int i=0;i<total_sub_size;i++) {
 	sub_tree[i].SetDefaults(pattern, num_dimensions, 
-				model, y_max);
-	//cout << "sub_tree created" << endl;
+                model, y_max);
     }
 
     sub_area = new Double_t[total_sub_size];
@@ -367,7 +333,6 @@ void PAdaptiveMeshN::Divide(Int_t num, Int_t my_layer) {
     for (int i=0;i<num_dimensions;i++) sub_mesh_pos[i]=0;
 
     while (current_mesh_pos < total_sub_size) {
-	//cout << current_mesh_pos<< ":"<< total_sub_size << endl;
 	for (int i=0;i<num_dimensions;i++) {
 	    //for each node we get the size of the sub-mesh
 	    if (sub_size[i]>1) {
@@ -409,7 +374,6 @@ void PAdaptiveMeshN::Divide(Int_t num, Int_t my_layer) {
     ReCalcYMax();
     
     if (layer > 0) {
-	//cout << "sub-divide" << endl;
 	for (int i=0;i<total_sub_size;i++) {
 	    sub_tree[i].Divide(num,layer-1);
 	    sub_tree[i].ReCalcYMax();
