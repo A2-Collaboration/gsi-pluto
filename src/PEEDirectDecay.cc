@@ -107,7 +107,9 @@ Bool_t PEEDirectDecay::GetWidth(Double_t mass, Double_t *width, Int_t didx) {
 
     if (!makeStaticData()->GetPWidx(is_channel) || width_init == 0) { // Enter below only on the first call
 #ifdef INGO_DEBUG
-	Info("GetWidth","Creating mesh in %s",makeStaticData()-> GetDecayName(is_channel));
+        if (pluto_global::verbosity >= 3) {
+            Info("GetWidth","Creating mesh in %s",makeStaticData()-> GetDecayName(is_channel));
+        }
 #endif
         width_init++;
         makeDynamicData()->GetParticleDepth(parent_id); // if 1st call will initialize flags

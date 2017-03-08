@@ -370,8 +370,9 @@ Bool_t PProjector::AddInputTNtuple(TNtuple * n,const  char * command) {
 	if (key_list_in[batch_pos-1][key_pos_in[batch_pos-1]] < 0) {
 	    key_list_in[batch_pos-1][key_pos_in[batch_pos-1]] = makeStaticData()->
 		MakeDirectoryEntry("batch_objects",NBATCH_NAME,LBATCH_NAME,name);
-	    Info("AddInputTNtuple","Created variable %s for the TNtuple branch",name);
-	    //cout << "Created " << name << endl;
+        if (pluto_global::verbosity >= 3) {
+            Info("AddInputTNtuple","Created variable %s for the TNtuple branch",name);
+        }
 	}
 
 	//Check if double is existing
@@ -449,84 +450,85 @@ Int_t  PProjector::SetParticles(PParticle ** mstack, int *decay_done, int * num,
 
     while (makeDataBase()->MakeListIterator(key, NBATCH_NAME, LBATCH_NAME , &listkey)) {
         //loop over all particles
-	
-	if (makeDataBase()->GetParamInt (listkey, pid_param,&i_result)) {
-	    Int_t pid=*i_result;
 
-	    //fill object
-	    Int_t pos = -1;
-	    if (makeDataBase()->GetParamInt (listkey, link_param,&i_result)) {
-		pos=*i_result-1;
-	    }
-	    
-	    //First clear the entry to avoid the use of old objects
-	    if (pos>=0) {
-		makeDataBase()->SetParamTObj (listkey ,batch_particle_param, NULL);
-	    } else if ((pos == -112)  &&  first_time && (*(proj_nr) == bulk_id)) { 
-		//stumbled over "+"
-		//cout << "CALLED + in "<< bulk_id << endl;
-		new_particles++;
-		if (new_particles == PROJECTOR_MAX_STACK) {
-		    Warning("Modify","PROJECTOR_MAX_STACK reached");
-		    return kFALSE;
-		}
-		if (new_particles>stackpointer) {
-		    //create new pparticle
-		    stack[stackpointer] = new PParticle(0,0,0,0);
-		    stackpointer++;
-		    Info("SetParticles","New particle created");
+        if (makeDataBase()->GetParamInt (listkey, pid_param,&i_result)) {
+            Int_t pid=*i_result;
 
-		}
-		mstack[*num]=&(stack[new_particles-1]);
-		stack[new_particles-1].SetID(pid);
-		stack[new_particles-1].SetW(1.0);
-		makeDataBase()->SetParamTObj (listkey ,batch_particle_param, &(stack[new_particles-1]));
-		(*num)++;
-	    } else if (pos == -1) {
-		//No pos, default 
-		makeDataBase()->SetParamTObj (listkey ,batch_particle_param, NULL);
-		Int_t particle_key = makeStaticData()->GetParticleKey(pid);
-		if (makeDataBase()->GetParamInt (particle_key, stream_default_pos_param ,&i_result)) {
-		    pos = (*i_result);
-		} else
-		    pos = 0;
-	    } else if (pos < -1000) { //found link to variable
-		//cout << "pos  is now:" << pos << edl;
-		Double_t *res;
-		if (makeDataBase()->GetParamDouble ((-(pos+1))-1000, batch_value_param ,&res)) {
-		    //cout << "key: " << ((-(pos+1))-1000) << " res: " << *res << endl;
-		    //makeDataBase()->ListEntries(-1,1,"*name,batch_value,*num_batch,*pid,*link");
-		    pos = ((Int_t) *res)-1;
-		} else {
-		    pos = -1000;
-		}
-	    }
+            //fill object
+            Int_t pos = -1;
+            if (makeDataBase()->GetParamInt (listkey, link_param,&i_result)) {
+                pos=*i_result-1;
+            }
 
-	    if (pos == -1000) {
-		Error("SetParticles","Unkown particle position for %s",makeDataBase()->GetName(listkey));
-	    }
+            //First clear the entry to avoid the use of old objects
+            if (pos>=0) {
+                makeDataBase()->SetParamTObj (listkey ,batch_particle_param, NULL);
+            } else if ((pos == -112)  &&  first_time && (*(proj_nr) == bulk_id)) {
+                //stumbled over "+"
+                new_particles++;
+                if (new_particles == PROJECTOR_MAX_STACK) {
+                    Warning("Modify","PROJECTOR_MAX_STACK reached");
+                    return kFALSE;
+                }
+                if (new_particles>stackpointer) {
+                    //create new pparticle
+                    stack[stackpointer] = new PParticle(0,0,0,0);
+                    stackpointer++;
+                    if (pluto_global::verbosity) {
+                        Info("SetParticles","New particle created");
+                    }
 
-	    //cout << "pos  is now:" << pos << " for " << makeDataBase()->GetName(listkey) <<  endl;
+                }
+                mstack[*num]=&(stack[new_particles-1]);
+                stack[new_particles-1].SetID(pid);
+                stack[new_particles-1].SetW(1.0);
+                makeDataBase()->SetParamTObj (listkey ,batch_particle_param, &(stack[new_particles-1]));
+                (*num)++;
+            } else if (pos == -1) {
+                //No pos, default
+                makeDataBase()->SetParamTObj (listkey ,batch_particle_param, NULL);
+                Int_t particle_key = makeStaticData()->GetParticleKey(pid);
+                if (makeDataBase()->GetParamInt (particle_key, stream_default_pos_param ,&i_result)) {
+                    pos = (*i_result);
+                } else
+                    pos = 0;
+            } else if (pos < -1000) { //found link to variable
+                //cout << "pos  is now:" << pos << edl;
+                Double_t *res;
+                if (makeDataBase()->GetParamDouble ((-(pos+1))-1000, batch_value_param ,&res)) {
+                    //cout << "key: " << ((-(pos+1))-1000) << " res: " << *res << endl;
+                    //makeDataBase()->ListEntries(-1,1,"*name,batch_value,*num_batch,*pid,*link");
+                    pos = ((Int_t) *res)-1;
+                } else {
+                    pos = -1000;
+                }
+            }
 
-	    for (int i=0;i<*num;i++) {
-		//cout << mstack[i]->IsActive() << endl;
-		if (mstack[i]->IsActive()) {
-		    
-		    //cout << "stack_pid:"<< mstack[i]->ID() << endl;
-		    //mstack[i]->Print();
-		    if ((mstack[i]->ID() == pid) || (pid==0)) { //0=DUMMY
-			//cout << "match " << pid << " at " << pos << endl;
-			if (pos==0) {
-			    //cout << "match2" << endl;
-			    TObject * delme =  (TObject *) mstack[i];
-			    makeDataBase()->SetParamTObj (listkey ,batch_particle_param, delme);
-			    //makeDataBase()->ListEntries(listkey,1,"name,*pid,*batch_particle");
-			} 
-			pos--;
-		    }
-		}
-	    }
-	}	
+            if (pos == -1000) {
+                Error("SetParticles","Unkown particle position for %s",makeDataBase()->GetName(listkey));
+            }
+
+            //cout << "pos  is now:" << pos << " for " << makeDataBase()->GetName(listkey) <<  endl;
+
+            for (int i=0;i<*num;i++) {
+                //cout << mstack[i]->IsActive() << endl;
+                if (mstack[i]->IsActive()) {
+
+                    //cout << "stack_pid:"<< mstack[i]->ID() << endl;
+                    //mstack[i]->Print();
+                    if ((mstack[i]->ID() == pid) || (pid==0)) { //0=DUMMY
+                        //cout << "match " << pid << " at " << pos << endl;
+                        if (pos==0) {
+                            //cout << "match2" << endl;
+                            TObject * delme =  (TObject *) mstack[i];
+                            makeDataBase()->SetParamTObj (listkey ,batch_particle_param, delme);
+                            //makeDataBase()->ListEntries(listkey,1,"name,*pid,*batch_particle");
+                        }
+                        pos--;
+                    }
+                }
+            }
+        }
     }
     return 0;
 
@@ -596,7 +598,9 @@ Bool_t PProjector::Modify(PParticle ** mstack, int *decay_done, int * num, int s
 	    if (fp_in[i]) {
 		//read the ntuple
 		if (num_events_in_c[i] == num_events_in[i]) {
-		    Info("Modify","NTuple <%s>: number of events reached",fp_in[i]->GetTitle());
+            if (pluto_global::verbosity) {
+                Info("Modify","NTuple <%s>: number of events reached",fp_in[i]->GetTitle());
+            }
 		    return kFALSE;
 		}
 
@@ -673,7 +677,9 @@ Bool_t PProjector::Modify(PParticle ** mstack, int *decay_done, int * num, int s
 	    i -=1; //stay in same batch
 	    retval &= ~kUPDATE;
 	} else if (retval & kEOF) {
-	    Info("Modify","EOF reached");
+        if (pluto_global::verbosity) {
+            Info("Modify","EOF reached");
+        }
 	    return kFALSE;
 	} else if (retval & kFOREACH) {
         startcommand = batch[i]->GetNewCommand();

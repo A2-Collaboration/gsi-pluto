@@ -166,7 +166,9 @@ Bool_t PAdaptiveMeshN::GetRandom() {
  	//re-scale everything!
  	bin->SetYMax(y_random);
 
- 	cout << "recalc" << endl;
+    if (pluto_global::verbosity) {
+        cout << "recalc" << endl;
+    }
 
  	ReCalc();
  	goto repeat2;
@@ -441,7 +443,9 @@ void PAdaptiveMeshN::ReCalcYMax(void) {
 	if (local_max>y_max) y_max = local_max;
     }
 
-    cout << "y_max" << y_max << endl;
+    if (pluto_global::verbosity) {
+        cout << "y_max" << y_max << endl;
+    }
 
 }
 
