@@ -75,6 +75,12 @@ TMethodCall* gMethodCall2;  // global pointer needed for user analysis
 FILE *PReaction::asciif=NULL;
 Int_t PReaction::globalEventCounter=0;
 
+// set global verbosity level
+void PReaction::setVerbosity(const int verbosity)
+{
+    pluto_global::verbosity = verbosity;
+}
+
 TClonesArray *PReaction::evt[MAX_NUM_BRANCHES+1];
 Int_t PReaction::activeCnt=0;
 
