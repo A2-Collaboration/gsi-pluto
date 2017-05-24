@@ -242,13 +242,13 @@ class PReaction : public TObject  {
     Bool_t Do(char * command) {
 	return GetCurrentProjector()->AddCommand(command);
     }
-    Bool_t Do(TH1F * f, char * command, Int_t flag=1) {
+    Bool_t Do(TH1 * f, char * command, Int_t flag=1) {
 	return GetCurrentProjector()->AddHistogram(f,command,flag);
     }
-    Bool_t Do(TH2F * f, char * command, Int_t flag=1) {
+    Bool_t Do(TH2 * f, char * command, Int_t flag=1) {
 	return GetCurrentProjector()->AddHistogram(f,command,flag);
     }
-    Bool_t Do(TH3F * f, char * command, Int_t flag=1) {
+    Bool_t Do(TH3 * f, char * command, Int_t flag=1) {
 	return GetCurrentProjector()->AddHistogram(f,command,flag);
     }
     Bool_t Output(TNtuple * f, char * command = (char *)"") {

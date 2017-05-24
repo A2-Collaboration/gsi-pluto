@@ -22,7 +22,7 @@
     Float_t sum = 0.;
     for(Int_t j=2;j<=5;j++) sum += h1->GetBinContent(j);
     h1 = 1./sum * h1;    // normalize multiplicity bins >0 to 1
-    //  for(Int_t j=1;j=<100;j++) printf("%d: %f\n",j,h1->GetBinContent(j)); 
+    //   for(Int_t j=1;j <= 100;j++) printf("%d: %f\n",j,h1->GetBinContent(j)); 
 
     char* products[] = {
 	"pi0","pi0","pi0","pi0","pi0","pi0","pi0","pi0","pi0","pi0",

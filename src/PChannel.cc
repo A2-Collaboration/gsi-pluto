@@ -466,6 +466,7 @@ void PChannel:: ThermalSampling() {
     *event_plane        = phi;
     for(i=1;i<=nTherm;i++) {
 	int didx = ptcls[i]->GetDecayModeIndex(1);
+    redo_thermal:
 	if (nTherm==1) {
 	    pFire->samplePartCM(px, py, pz, Energy,didx);
 	}
@@ -484,6 +485,7 @@ void PChannel:: ThermalSampling() {
 	    }
 	}
 	ptcls[i]->SetPxPyPzE(px, py, pz, Energy);
+	if (ptcls[i]->M() < PData::LMass(ptcls[i]->ID()) || ptcls[i]->M() > PData::UMass(ptcls[i]->ID())) goto redo_thermal; //TODOv6
 	ptcls[i]->SetW(w*(pFire->mtScale(ptcls[i]->M())));  // weight * mt-scaling
 	if (sourceid) ptcls[i]->SetSourceId(sourceid);
 	else ptcls[i]->SetSourceId(pFire->ID());

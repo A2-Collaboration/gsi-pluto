@@ -60,7 +60,7 @@
 PHGeantOutput::PHGeantOutput() {
     // init variables
     asciiFile        = NULL;
-    ctEvt            = 0;
+    ctEvt            = 1;
     writeSEQNUMBER   = kTRUE;
 
     //globals from data base
@@ -69,13 +69,14 @@ PHGeantOutput::PHGeantOutput() {
 
 }
 
-bool PHGeantOutput::OpenFile(char * filename)
+bool PHGeantOutput::OpenFile(const char *_filename)
 {
     // open the ascii output file. returns kFALSE
     // if not successful.
 
-    if(filename){
-	TString name = filename;
+    if(_filename){
+	filename = _filename;
+	TString name = _filename;
 	if(name.CompareTo("") != 0){
 	    asciiFile = fopen(name.Data(),"w");
 	    if(!asciiFile){
@@ -106,7 +107,7 @@ bool PHGeantOutput::CloseFile(void) {
     return kFALSE;
 }
 
-bool PHGeantOutput::WriteEvent(void)
+bool PHGeantOutput::WriteEventHeader(void)
 {
     // Write the event header. The io flag is coded
     // by the diffent switches. The blast parameter
@@ -147,9 +148,12 @@ bool PHGeantOutput::WriteParticle(PParticle *par)
 {
     // write one particle to the ascii output file.
     // the format of the line depends on the settings of
-    // difefrent switches.
+    // different switches.
+    if(!par->IsActive()) return kTRUE;
 
-    if(asciiFile)
+    if(branchNum) return kTRUE; //skip additional particle for the time being
+
+    if(asciiFile )
     {
 	if (!getVERTEX) {
 	    if(writeINDEX == 0) {

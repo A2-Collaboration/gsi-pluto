@@ -33,6 +33,8 @@ PEtaPiPiDileptonMass::PEtaPiPiDileptonMass(const Char_t *id, const Char_t *de, I
     m_pi    = makeStaticData()->GetParticleMass("pi+");
     mass_e  = makeStaticData()->GetParticleMass("e-"); 
     mass_ee = 2.*mass_e;
+    vmd_formfactor_model = NULL;
+
     //it is important to avoid energy conservation violation, otherwise
     //genbod will be much slower:
     SetDynamicRange(mass_ee,makeStaticData()->GetParticleMass("eta")-2*m_pi);

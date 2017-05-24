@@ -72,6 +72,8 @@ class PFireball: public PParticle {
   PFunction *pfE;      //!Envelope for thermal channel model E
   PAdaptiveMeshN *afE; //!Mesh for  thermal channel model E
 
+  Float_t y0;          // mid-rapidity of source 
+
  public:
   PFireball(char* name, float AGeV, float t1, float t2=0.0, float f=1.0,
   float b=0.0, float a2=0.0, float a4=0.0, float w1=0.0, float w2=0.0, int sp=0);

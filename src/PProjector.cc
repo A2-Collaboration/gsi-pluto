@@ -37,8 +37,14 @@
 
 PProjector::PProjector() {
     batch_pos=0;
-    pid_param= makeDataBase()->GetParamInt("pid");
-    link_param= makeDataBase()->GetParamInt("link");
+    pid_param= makeDataBase()->GetParamInt("batch_pid");
+    if (pid_param<0) 
+	pid_param = makeDataBase()->MakeParamInt("batch_pid", "PID for batch");
+    
+    link_param= makeDataBase()->GetParamInt("batch_position");
+    if (link_param<0) 
+	link_param = makeDataBase()->MakeParamInt("batch_position", "PID position for batch");
+    
     batch_particle_param = makeDataBase()->GetParamTObj("batch_particle");
     w = makeStaticData()->GetBatchValue("_w");
     
@@ -155,6 +161,7 @@ Bool_t PProjector::AddHistogram(TH3 * histo, const char * command, Int_t fillfla
 	return kFALSE;
     }
 
+    if (batch[batch_pos-1]->IsReadonly()) fillflag=0;
     batch[batch_pos-1]->SetToolObject(histo);
     fFillFlag[batch_pos-1]=fillflag;
 
@@ -191,6 +198,7 @@ Bool_t PProjector::AddHistogram(TH2 * histo, const char * command, Int_t fillfla
 	return kFALSE;
     }
 
+    if (batch[batch_pos-1]->IsReadonly()) fillflag=0;
     batch[batch_pos-1]->SetToolObject(histo);
     fFillFlag[batch_pos-1]=fillflag;
 
@@ -216,7 +224,8 @@ Bool_t PProjector::AddHistogram(TH1 * histo, const char * command, Int_t fillfla
 	Error ("AddHistogram","Double _x not found");
 	return kFALSE;
     }
-
+    
+    if (batch[batch_pos-1]->IsReadonly()) fillflag=0;
     batch[batch_pos-1]->SetToolObject(histo);
     fFillFlag[batch_pos-1]=fillflag;
 
@@ -451,7 +460,7 @@ Int_t  PProjector::SetParticles(PParticle ** mstack, int *decay_done, int * num,
 
     while (makeDataBase()->MakeListIterator(key, NBATCH_NAME, LBATCH_NAME , &listkey)) {
         //loop over all particles
-	
+	//cout << "key=" << listkey << endl;
 	if (makeDataBase()->GetParamInt (listkey, pid_param,&i_result)) {
 	    Int_t pid=*i_result;
 
@@ -460,7 +469,7 @@ Int_t  PProjector::SetParticles(PParticle ** mstack, int *decay_done, int * num,
 	    if (makeDataBase()->GetParamInt (listkey, link_param,&i_result)) {
 		pos=*i_result-1;
 	    }
-	    
+	    //cout << "key=" << listkey << " pos:" << pos << endl;
 	    //First clear the entry to avoid the use of old objects
 	    if (pos>=0) {
 		makeDataBase()->SetParamTObj (listkey ,batch_particle_param, NULL);
@@ -681,7 +690,7 @@ Bool_t PProjector::Modify(PParticle ** mstack, int *decay_done, int * num, int s
 	    Info("Modify","EOF reached");
 	    return kFALSE;
 	} else if (retval & kFOREACH) {
-	    startcommand = batch[i]->GetNewCommand();
+	    startcommand = batch[i]->GetOldCommand();
 	    //cout << "startcommand " << startcommand << endl;
 	    i -= 1; //redo current loop
 	    SetParticles(mstack, decay_done, num, stacksize, 0);  //reset particles like for "formore"

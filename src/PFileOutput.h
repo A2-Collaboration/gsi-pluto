@@ -16,7 +16,8 @@ class PFileOutput: public PBulkInterface {
 
  protected:
 
-     Int_t cnt;              //! number of particles in Event
+     Int_t cnt;              //! number of total particles in event
+     Int_t subcnt;           //! number of particles in branch
      Int_t getVERTEX;        //! transport getVERTEX switch from PReaction
      Int_t writeINDEX;       //! transport writeINDEX switch from PReaction
      Int_t allPARTICLES;     //! transport allPARTICLES switch from PReaction
@@ -24,36 +25,49 @@ class PFileOutput: public PBulkInterface {
      PChannel** channel;     //! transport channel array from PReaction
      Int_t      nChannel;    //! transport number of channels in array
 
-     char filename_app[1024];
+     Int_t branchNum;        //! Branch number, 0:std branch, >0:additional branches
+     const char *branchName; //! Branch name
+
+     const char *filename;
+
   public:
     PFileOutput();
 
-    void SetHeader(Int_t my_cnt, 
-		   Int_t my_allPARTICLES,
-		   Int_t my_getVERTEX,
-		   Int_t my_asciiOUTPUT,
-		   Int_t my_writeINDEX,
-		   PChannel** my_channel,
-                   Int_t my_nCahnnel
+    void SetHeader(Int_t _cnt, 
+		   Int_t _allPARTICLES,
+		   Int_t _getVERTEX,
+		   Int_t _asciiOUTPUT,
+		   Int_t _writeINDEX,
+		   PChannel** _channel,
+                   Int_t _nCahnnel
 		  ) {
 	//number of expected WriteParticles:
-	cnt=my_cnt;
+	cnt          = _cnt;
 	//PReaction flags:
-	allPARTICLES = my_allPARTICLES;
-	getVERTEX    = my_getVERTEX;
-	asciiOUTPUT  = my_asciiOUTPUT;
-	writeINDEX   = my_writeINDEX;
-	channel      = my_channel;
-        nChannel     = my_nCahnnel;
+	allPARTICLES = _allPARTICLES;
+	getVERTEX    = _getVERTEX;
+	asciiOUTPUT  = _asciiOUTPUT;
+	writeINDEX   = _writeINDEX;
+	channel      = _channel;
+        nChannel     = _nCahnnel;
     };
 
-    virtual bool OpenFile(char * filename);      //filename
+    void SetBranchHeader(Int_t _subcnt, Int_t _branchNum, const char *_branchName) {
+	subcnt     = _subcnt;
+	branchNum  = _branchNum;
+	branchName = _branchName;
+    };
+
+    virtual bool OpenFile(const char *_filename);      //filename
     virtual bool CloseFile(void);                //
     virtual bool WriteEvent(void);               //next event
-    virtual bool WriteParticle(PParticle *par);  //write one particle
+    virtual bool WriteEventHeader(void);
+    virtual bool WriteBranchHeader(void);
+    virtual bool WriteParticle(PParticle *par);  //write single particle
 
+    const char * GetFilename(){return filename;};
 
-    ClassDef(PFileOutput,0) // Pluto file output template
+    ClassDef(PFileOutput,0) // Pluto file output base class
 };
 #endif 
 

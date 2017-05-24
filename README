@@ -1474,7 +1474,7 @@ V5.42:
                                         I. Froehlich
                                         IKF, 13/03/2013
 
-dev
+V5.43:
 ======
 
 358) Added Do() method and bulk interface also to PChannel
@@ -1498,6 +1498,46 @@ dev
 363) Added beam line transport code (work done by T. Hennino) in
      plugins/beamline. Still w.i.p. Added filter variable for beam tube.
 
-364) Fixed strange peak in dimuon spectrum in "w -> pi0 mumu" (rep by E. Krebs)
+364) Fixed strange peak in dimuon spectrum in "w -> pi0 mumu" (rep. by E. Krebs)
 
 365) Added "Delta -> N dimuon" to the list of Dalitz decays in PData::IsDalitz
+
+366) Made enhancement configuration for free bulk decays more elegant
+     (req. by J. Markert)
+
+367) Changed file output interface and made some changes in PReaction in order
+     to add the new branches.
+     
+369) Added template for gamma conversion
+     
+370) Added GetRandom function to PBatch for sampling from histograms,
+     added GetRandomX/Y functions to sample from histogram slices
+
+371) Fixed bug in PFireball (corrected by R. Holzmann and M. Lorenz)
+
+372) Implemented gamma conversion (R. Holzmann and C. Behnke)
+
+
+                                        I. Froehlich
+                                        IKF, 21/07/2015
+                                        
+                                        
+dev
+
+373) Fixed bug in vertex setting in PReaction, rep. by J. Markert
+
+374) Fixed bug in PSaid (double delete), rep. by J. Markert
+
+375) Fixed bug in thermal sampling (mass out of bounds, rep. by R. Holzmann)
+
+376) Fixed bug in random number generation (seed not used in
+     TF1->GetRandom in PFireball, rep. by R. Holzmann and J. Markert)
+
+377) Fixed bug in PDecayManager (crash seen with newer linux versions,
+     rep. by K. Nowakowski) 
+
+378) Fixed bug in PDecayChannel dtor, rep. by J. Markert
+
+379) Fixed bug in PHUrEventHeader.h (missing TObject inheritance)
+
+380) Added histogram smearing option in PBeamSmearing

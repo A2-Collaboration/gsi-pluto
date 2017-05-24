@@ -31,7 +31,7 @@ class PDiLepton: public PParticle {
   Float_t getPt2() { return pt2; }
   Float_t getY1()  { return y1; }
   Float_t getY2()  { return y2; }
-  Int_t isDilepton() { return 1; }
+  Int_t IsDilepton() { return 1; }
   void samplePartCM(double &px, double &py, double &pz, double &E); 
   virtual void Print(const Option_t* delme=NULL) const;
   virtual ~PDiLepton() { }

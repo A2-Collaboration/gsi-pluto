@@ -56,7 +56,7 @@ PStaticData::PStaticData() {
     parity_param = base->GetParamInt("parity");
     mass_param   = base->GetParamDouble("mass");
     width_param  = base->GetParamDouble("width");
-    pkf_param    = base->GetParamInt("pkf");
+    pkf_param    = base->GetParamInt("pythiakf");
     didx_param   = base->GetParamInt("didx");
     widx_param   = base->GetParamInt("widx");
     mesh_param   = base->GetParamTObj("mesh");
@@ -1521,7 +1521,42 @@ int PStaticData:: GetDecayIdx(int * pid, int n) {
     return -1;
 }
 
-int PStaticData:: GetDecayKey(int * pid, int n) {
+int PStaticData::GetDecayIdx(const char *parent, const char *daughters) {
+    //get parent key
+    Int_t parent_key = GetParticleKey(parent);
+    if (parent_key < 0) {
+	Error("AddDecay","Parent %s not found in data base", parent);
+	return -1;
+    }
+
+    Int_t pid=GetParticleIDByKey(parent_key);
+    if (pid<0) {
+	Error("AddDecay", "Parent %s has no pid", parent);
+	return -1;
+    }
+
+     //now add the daughters
+    char *arr1[MAX_DAUGHTERS];
+    Int_t arr1_s=MAX_DAUGHTERS; //max decay products
+    
+    PUtils::Tokenize(daughters, ",", arr1, &arr1_s);
+    //does decay already exist?
+
+    Int_t pids[MAX_DAUGHTERS+1];
+    pids[0] = pid;
+ 
+    for (int pat = 0; pat < arr1_s; pat++) {
+	pids[pat+1] = GetParticleID(arr1[pat]);
+    }
+
+    Int_t key = GetDecayKey(pids, arr1_s);
+    if (key>=0) {	
+	return GetDecayIdxByKey(key);
+    }
+    return -1;   
+}
+
+int PStaticData::GetDecayKey(int * pid, int n) {
     // decay-mode key from parent and product ids;
     // n is the size of the daughters array
     // arguments: pointer to pid array of parent & products,
@@ -1733,6 +1768,32 @@ void PStaticData::SetEnhanceChannelBR(const int id, const double factor) {
     }
     *d_result=factor;
 };
+
+void PStaticData::SetEnhanceChannelBR(const char *parent, const char *decay, Double_t factor) {
+    Int_t didx = GetDecayIdx(parent, decay);
+    if (didx < 0) {
+	Error("SetEnhanceChannelBR", "Decay %s -> %s not found in data base", parent, decay);
+	return;
+    }
+    SetEnhanceChannelBR(didx, factor);
+}
+
+void PStaticData::DisableAllChannelBR(const char *parent) {
+    Int_t key = GetParticleKey(parent);
+    if (key < 0) {
+	Error("DisableAllChannelBR", "Parent %s not found in data base", parent);
+	return;
+    }
+    Int_t *didx;
+    Int_t listkey    = -1;
+    Int_t link_param = makeDataBase()->GetParamInt("link");
+    while (makeDataBase()->MakeListIterator
+	   (key, pnmodes_param, link_param, &listkey)) {	
+	makeDataBase()->GetParamInt 
+	    (listkey, didx_param , &didx); //small workaround -> should work on keys
+	SetEnhanceChannelBR(*didx, 0.);
+    }
+}
 
 Double_t PStaticData::GetEnhanceChannelBR(const int id) {
     if (! makeDataBase()->GetParamDouble (didx_param, id , enhance_br_param, &d_result)) {

@@ -215,7 +215,6 @@ void PDynamicData::ListDecayBR(int id, double m) {
 int PDynamicData:: PickDecayChannel(const int & id, const double & m) {
     // returns the index of a decay mode for particle pid=id of mass m (GeV/c**2)
     // selected randomly, consistent with the branching ratios
-
     
     if (!makeStaticData()->IsParticleValid(id)) {
 	// pid out of range

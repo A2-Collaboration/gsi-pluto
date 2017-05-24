@@ -32,6 +32,12 @@ class PBeamSmearing : public PDistribution  {
 
     void SetMomentumFunction(TF1 * f) {mom_function=f;};
     //A function which desribes the absolute momentum distribution
+
+    void SetMomentumSmearing(TH1 * f) {mom_smearing_histo=f;};
+    //A function stretching the beam momentum (x=1 means no modification)
+
+    void SetMomentumFunction(TH1 * f) {mom_function_histo=f;};
+    //A function which desribes the absolute momentum distribution
     
     void SetBeamParameters(Double_t th, Double_t ph, Double_t sig) {
 	//N.B. these are in units DEGREE because this is more convenient!
@@ -55,6 +61,8 @@ class PBeamSmearing : public PDistribution  {
     TF1     *mom_smearing;
     TF1     *mom_function;
     TF1     *ang_smearing;
+    TH1     *mom_smearing_histo;
+    TH1     *mom_function_histo;
     Double_t thetaBeam;           // polar angle of beam
     Double_t phiBeam;             // azimuthal angle of beam
     Double_t sigmaBeam;           // smearing of beam

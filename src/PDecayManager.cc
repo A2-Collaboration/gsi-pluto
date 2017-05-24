@@ -537,10 +537,11 @@ PReaction* PDecayManager::GetNextReaction(int wf, char* name,  int f0,
     char* filename;
   
     if (verbose) cout << "Selecting next reaction:" << endl;
-    if (ListForReaction) delete [] ListForReaction;
-  
+
     if (CurrentReaction) delete CurrentReaction;
-  
+    
+    if (ListForReaction) delete [] ListForReaction;
+
     if (!ReactionList) {
 	if (verbose) cout << " No initialization done." << endl;
 	return NULL;
@@ -732,7 +733,8 @@ Int_t PDecayManager::Loop(int num, int wf, char* name, int f0,
 	    else rEntries = r->loop((Int_t)(num*rWeight + 0.5),0);
 	    SumOfEvents += rEntries;
 	    rStop = SumOfEvents;
-
+	    CurrentReaction = NULL; //TODOv6
+	    //...cannot delete CurrentReaction -> CRASH
 	    r=GetNextReaction(wf,name,f0,f1,f2,f3,td);
 	    if (ti) ti->Fill();
 	}
