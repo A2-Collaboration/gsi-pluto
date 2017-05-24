@@ -17,7 +17,7 @@ class PHGeantOutput: public PFileOutput {
     Double_t *event_impact_param, *seqnr;
 
  protected:
-    //char filename_app[1024];
+
      FILE* asciiFile;
      Int_t ctEvt;
      Int_t ctParticlePerEvt;
@@ -25,9 +25,9 @@ class PHGeantOutput: public PFileOutput {
  public:
     PHGeantOutput();
 
-    bool OpenFile(char * filename);      //filename
+    bool OpenFile(const char *_filename);      //filename
     bool CloseFile(void);                //
-    bool WriteEvent(void);               //next event
+    bool WriteEventHeader(void);          
     bool WriteParticle(PParticle *par);  //write one particle
     void SetWriteSeqNumber(Bool_t write) { writeSEQNUMBER = write; }
 

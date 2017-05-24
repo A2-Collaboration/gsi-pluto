@@ -196,6 +196,7 @@ class PStaticData : public TObject {
     void GetDecayModeByKey(const int, int * n); 
 
     int GetDecayIdx(int * pid, int n); // decay-mode index from parent and product ids; ->getChannel
+    int GetDecayIdx(const char *parent, const char *daughters);
     int GetDecayKey(int * pid, int n); 
     int GetDecayKey(const int & id);
     int GetDecayIdxByKey(int key);
@@ -208,6 +209,8 @@ class PStaticData : public TObject {
     void   SetDecayEmin(const int & idx, const double v);
 
     void SetEnhanceChannelBR(const int id, const double factor); //enhance the BR for PickDecayChannel
+    void SetEnhanceChannelBR(const char *parent, const char *decay, Double_t factor = 1.);
+    void DisableAllChannelBR(const char *parent);
     Double_t GetEnhanceChannelBR(const int id);
 
     //for dynamic stuff

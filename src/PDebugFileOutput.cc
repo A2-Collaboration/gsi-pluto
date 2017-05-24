@@ -22,8 +22,7 @@ PDebugFileOutput::~PDebugFileOutput() {
 };
 
 bool PDebugFileOutput::OpenFile(char * filename) {
-    sprintf(filename_app,"%s.dbg",filename);
-    fp = fopen(filename_app,"w");
+    fp = fopen(filename,"w");
     if (fp) return kTRUE;
     return kFALSE;
 }

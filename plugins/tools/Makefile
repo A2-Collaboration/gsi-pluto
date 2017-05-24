@@ -1,7 +1,7 @@
 ###
 
-LOCAL_CLASSES    := PHadesParticleSmearer PHGeantOutput PHUrCollisionHeader PHUrEventHeader PHUrParticle PHUrAddon PHUrDilep PHUrReader
-LOCAL_COLLECTION := PDistributionManager.mod.cc
+LOCAL_CLASSES    := PGammaConversion
+LOCAL_COLLECTION := 
 
 
 

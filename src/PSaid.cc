@@ -1563,8 +1563,8 @@ void PSaid::defaults(void) {
 }
 
 PSaid::~PSaid() {
-    y.~TArrayD();
-    aa.~TArrayD();
+    //y.~TArrayD();
+    //aa.~TArrayD();
     //delete REngine;
     told=-1.;      // to make sure that tables are recalculated for new object
 }

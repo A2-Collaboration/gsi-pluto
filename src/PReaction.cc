@@ -1212,6 +1212,15 @@ int PReaction::Loop(int nevents, int wf, int verbose) {
 		break; 
 	    }
 
+		//Rewrite vertex, just in case....
+		if (channel) {
+	    	for (j=0;j<nchan;j++) {
+				(channel[j]->GetParticles())[0]->SetVertex(*vertex_x,
+							   *vertex_y,
+							   *vertex_z,0.);
+			} 
+		}
+
 	    for (int ii=old_size;ii<size;ii++) {
 		//set index for "new" particles. 
 		particle_stack[ii]->SetIndex(ii);		
@@ -1238,9 +1247,9 @@ int PReaction::Loop(int nevents, int wf, int verbose) {
 	//Loop over all Particles and set the initial weight
 	//This includes the particles from the prologue
 	for (int ii=0;ii<size;ii++) {
-	    if (*weight_version) 
-		particle_stack[ii]->SetW(PChannel::GetGlobalWeight() 
-					 *particle_stack[ii]->GetMultiplicity());
+	    if (*weight_version) {
+		particle_stack[ii]->SetW(/* PChannel::GetGlobalWeight() * */ particle_stack[ii]->GetMultiplicity());
+	    }
 	    particle_stack[ii]->SetStatus(STATUS_NOT_DECAYED);
 	    //cout << "set particle " << ii << " active" << endl;
 	    particle_stack[ii]->SetActive(); //active by default, otherwise it is 
@@ -1724,59 +1733,68 @@ int PReaction::Loop(int nevents, int wf, int verbose) {
 
 
 	if (!HGeant) {
-	    cnt = 0;
-	    pclone=evt[0];
+	    cnt    = 0;
+	    pclone = evt[0];
 	    pclone->Delete();
 
-	    //First count the number of particles
-	    for (k=0;k<size;++k) {
-		if (particle_stack[k]->IsActive()==kFALSE) continue; //skip inactive prtcls.
-		cnt++;
-	    }
+	    //Write standard particles into tree
+	    for (k=0; k<size; ++k) {  // update TClonesArrays
 
-	    Int_t final_num = 0;
-
-	    for (int z=0;z<fileoutput_pos;z++) {
-		final_num = size; //reset number
-		files[z]->SetHeader(cnt, allPARTICLES, getVERTEX, asciiOUTPUT, writeINDEX , channel, nchan);
-		files[z]->Modify(particle_stack, 
-				 decay_done, &final_num, 
-				 stacksize);
-		files[z]->WriteEvent();
-	    }
-	    cnt = 0; //reset cnt
-
-	    for (k=0;k<size;++k) {               // update TClonesArrays
-
-		if (particle_stack[k]->IsActive()==kFALSE) 
+		if (particle_stack[k]->IsActive() == kFALSE) 
 		    continue; //skip inactive prtcls.
 		if (!allPARTICLES && decay_done[k]) 
 		    continue; //skip decayed prtcls.
 
 		particle_stack[k]->SetT(particle_stack[k]->T()/300.);// go from mm/c to ns
-		int save_sclone=particle_stack[k]->GetScatterClone();
+		int save_sclone = particle_stack[k]->GetScatterClone();
 		particle_stack[k]->SetScatterClone(0);
 		(*pclone)[cnt] = new((*pclone)[cnt]) PParticle(*particle_stack[k]);
-
 		particle_stack[k]->SetScatterClone(save_sclone);
 
-		for (int z=0;z<fileoutput_pos;z++)
-		    files[z]->WriteParticle(particle_stack[k]);
 		cnt++;
 	    }
 	    activeCnt = cnt;
 
-	    for (int i=0;i<size_branches;i++) {
-		pclone=evt[i+1];
+	    //Count the number of particles in additional branches
+	    for (int i=0; i<size_branches; i++) {
+		pclone = evt[i+1];
 		pclone->Delete();
-		for (k=0;k<(current_size_branches[i]);k++) { 
+		for (k=0; k<(current_size_branches[i]); k++) { 
 		    (*pclone)[k] = new((*pclone)[k]) PParticle(*(p_array_branches[i*stacksize + k]));
-		    //(p_array_branches[i*stacksize + k])->Print();
-		    //cout << i << ":" << k << ":" <<  p_array_branches[i*stacksize + k] << endl;
+		    cnt++;
 		}
 	    }
 
-	    if ((tree) &&  ((strlen(filename) > 0) || extTREE)) //otherwise memory leak
+	    for (int z=0; z<fileoutput_pos; z++) {
+		files[z]->SetHeader(cnt, allPARTICLES, getVERTEX, asciiOUTPUT, writeINDEX , channel, nchan);
+		files[z]->WriteEventHeader();
+		files[z]->SetBranchHeader(activeCnt, 0, "Particles");
+		files[z]->WriteBranchHeader();
+		files[z]->Modify(particle_stack, 
+				 decay_done, &size, 
+				 stacksize);
+
+		//First write the standard particles
+		for (k=0; k<size; ++k) {
+		    if (particle_stack[k]->IsActive()==kFALSE) 
+			continue; //skip inactive prtcls.
+		    if (!allPARTICLES && decay_done[k]) 
+			continue; //skip decayed prtcls.
+		    files[z]->WriteParticle(particle_stack[k]);
+		}
+
+		//Now write the additional particles
+		for (int i=0; i<size_branches; i++) {
+		    files[z]->SetBranchHeader(current_size_branches[i], i+1, makeDataBase()->GetName(key_branches[i]));
+		    files[z]->WriteBranchHeader();
+		    for (k=0; k<(current_size_branches[i]); k++) { 
+			files[z]->WriteParticle(p_array_branches[i*stacksize + k]);
+		    }
+		}
+		files[z]->WriteEvent();
+	    }
+
+	    if ((tree) && ((strlen(filename)>0) || extTREE)) //otherwise memory leak
 		tree->Fill();
 	}
     
@@ -1912,13 +1930,28 @@ void PReaction:: Print(const Option_t* delme) const {
 	}
     }
  
-
-    if (strlen(filename)>0) {
-	printf("   Output Files:\n");
-	printf("     Root : %s, %s",(const char*)file2,OType[allPARTICLES]);
-	if (getVERTEX) printf(" including vertices.\n");
-	else printf(".\n");
-	if (asciiOUTPUT) printf("     Ascii: %s, %s\n",(const char*)file1,OType[0]);
+    if (fileoutput_pos || strlen(filename)>0) {
+	printf("   Output File(s):\n");
+	if (strlen(filename) > 0) {
+	    printf("     Root : '%s', %s", (const char*)file2, OType[allPARTICLES]);
+	    if (getVERTEX) 
+		printf(" including vertices.\n");
+	    else 
+		printf(".\n");
+	    if (asciiOUTPUT) 
+		printf("     ASCII: '%s', %s\n", (const char*)file1, OType[0]);
+	
+	}
+	for (int i=0; i<fileoutput_pos; i++) {	    
+	    printf("     User-file: '%s', %s\n", files[i]->GetFilename(), OType[allPARTICLES]);
+	}
+	if (size_branches) {
+	    printf("   Output Branches(s):\n");
+	    printf("     'Particles'\n");
+	    for (int i=0; i<size_branches; i++) {
+		printf("     '%s'\n", makeDataBase()->GetName(key_branches[i]));
+	    }
+	}
     }
     else
 	printf("   *NO* output File\n");

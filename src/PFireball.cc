@@ -16,6 +16,8 @@
 //                    Revised: 02.02.2007 R.H.  (add E p**n exp(-E/T) behavior)
 //                    Revised: 16.02.2007 R.H.  (add angle-dependent temperature)
 //                    Revised: 21.02.2007 R.H.  (add sampling from histogram)
+//                    Revised: 10.06.2014 R.H.  (fixed bug in v1,v2 sampling)
+//                    Revised: 27.05.2015 R.H.  (adapted v1,v2 behavior for spectator sources)
 //
 // Ref 1: Gosset et al. PRC 16 (1977) 629
 //        (number of projectile participant nucleons for
@@ -297,6 +299,7 @@ void PFireball::setToMidrapidity(float agev) {  // boost thermal source to
 	double by = 0.;
 	double bz = sqrt(agev/(agev+2.*0.9315));
 	Boost(bx,by,bz);
+        y0 = 0.5*log((1.+bz)/(1.-bz));  // midrapidity
     }
     else if (spect==1) return;
     else if (spect==2) {
@@ -404,19 +407,20 @@ void PFireball::samplePartCM(double& px, double& py, double& pz, double& E, int 
 	    M=makeStaticData()->GetParticleMass(prodId);
 	}
 	Double_t pt = sqrt(mt*mt-M*M);
-	pz = mt*sinh(y);     
+	pz = mt*sinh(y);   // in c.m. system
 	E = mt*cosh(y);
 	theta = atan(pt/pz);
 	//phi = 2.*TMath::Pi()*PUtils::sampleFlat();  // --> Flat sampling, no v1,v2
-	Double_t cost = cos(theta);
+	Double_t cost = cos(theta);  // in c.m.
 	Double_t sint = sin(theta);
+        if (spect!=0) cost = sint = 1;  // do not modulate flow for spectator sources
 	Double_t val, valmax;
 	Int_t i = 0;
 	do {           // sample phi now
 	    i++;
 	    phi = 2.*TMath::Pi()*PUtils::sampleFlat(); 
 	    val = 1. + 2.*(v1*cos(phi)*cost + v2*cos(2.*phi)*sint);
-	    valmax = 1. + 2.*(TMath::Abs(v1)*cost + TMath::Abs(v2)*sint);
+	    valmax = 1. + 2.*(TMath::Abs(v1*cost) + TMath::Abs(v2*sint));
 	} while (valmax*PUtils::sampleFlat()>val  &&  i<100);
      
 	px = pt*cos(phi+phiPlane);
@@ -463,6 +467,11 @@ void PFireball::samplePartCM(double& px, double& py, double& pz, double& E, int 
 
     Double_t cost = cos(theta);
     Double_t sint = sin(theta);
+    Double_t costs = cost;
+    Double_t sints = sint;
+    if (spect!=0) cost = sint = 1;  // do not modulate flow for spectator sources
+
+    //    cost = sint = 1;   // for testing purposes
 
     Double_t val, valmax;
     Int_t i = 0;
@@ -470,12 +479,12 @@ void PFireball::samplePartCM(double& px, double& py, double& pz, double& E, int 
 	i++;
 	phi = 2.*TMath::Pi()*PUtils::sampleFlat(); 
 	val = 1. + 2.*(v1*cos(phi)*cost + v2*cos(2.*phi)*sint);
-	valmax = 1. + 2.*(TMath::Abs(v1)*cost + TMath::Abs(v2)*sint);
+	valmax = 1. + 2.*(TMath::Abs(v1*cost) + TMath::Abs(v2*sint));
     } while (valmax*PUtils::sampleFlat()>val  &&  i<100);
 
-    px = p*sint*cos(phi+phiPlane);
-    py = p*sint*sin(phi+phiPlane);
-    pz = p*cost;
+    px = p*sints*cos(phi+phiPlane);
+    py = p*sints*sin(phi+phiPlane);
+    pz = p*costs;
     //cout << "exit samplePartCM" << endl;
 }
 
@@ -490,7 +499,8 @@ float PFireball::sampleB()  const {
     return b;
 }
 
-int PFireball::sampleNProd() {
+int PFireball::sampleNProd() {  // sample Poisson multiplicity
+  //    return int(meanN);   // don't sample (for test purposes)
     return PUtils::samplePoisson(meanN);
 }
 

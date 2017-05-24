@@ -147,9 +147,9 @@ Bool_t PFermiMomentumGA::SampleMass(void) {
 
     composite->Reconstruct();                        
 
-   // cout << "*********" << endl;
-   //  composite->Print();
-   //  spectator->Print();
+    //cout << "*********" << endl;
+    //composite->Print();
+    //spectator->Print();
 
     //boost scatter back to lab
     participant->Boost(parent->BoostVector());

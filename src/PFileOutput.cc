@@ -14,11 +14,12 @@
 
 
 PFileOutput::PFileOutput() {
-    cnt=-1; 
-    getVERTEX=0;
+    cnt       = -1; 
+    getVERTEX = 0;
+    filename  = "<user file>";
 }
 
-bool PFileOutput::OpenFile(char * filename) {
+bool PFileOutput::OpenFile(const char * filename) {
     return kFALSE; //pure virtual not allowed
 }
 
@@ -32,6 +33,13 @@ bool PFileOutput::WriteEvent(void) {
     return kFALSE; //pure virtual not allowed
 }
 
+bool PFileOutput::WriteEventHeader(void) {
+    return kFALSE; //pure virtual not allowed
+}
+
+bool PFileOutput::WriteBranchHeader(void) {
+    return kFALSE; //pure virtual not allowed
+}
 
 bool PFileOutput::WriteParticle(PParticle *par) {
     //write one particle

@@ -67,7 +67,9 @@ using namespace std;
 #define COMMAND_PRINT     'p'
 #define COMMAND_ROT       'r'
 #define COMMAND_THETA     't'
-#define COMMAND_GETRANDOM 'x'
+#define COMMAND_GETRANDOM 'v'
+#define COMMAND_GETRANDOMX 'x'
+#define COMMAND_GETRANDOMY 'y'
 
 
 #define COMMAND_ANGLE    'A'
@@ -165,6 +167,9 @@ class PBatch : public TObject {
     TH3       *fHisto3;
     TGraph    *fGraph;
     TGraph2D  *fGraph2D;
+    Int_t      is_readonly;
+    TH1D      **slicesx, **slicesy;
+
     FILE      *file, *tmp_file;
     PParticle *current_particle; //For push command
 
@@ -215,7 +220,6 @@ class PBatch : public TObject {
 	return kFALSE;
     }
 
-
     void SetToolObject(TH1 * Histo1) {
 	fHisto1 = Histo1;
     }
@@ -236,6 +240,9 @@ class PBatch : public TObject {
     }
     void SetToolObjectTmp(FILE * f) {
 	tmp_file = f;
+    }
+    Int_t IsReadonly() {
+	return is_readonly;
     }
 
     PParticle *GetCurrentParticle(void) {

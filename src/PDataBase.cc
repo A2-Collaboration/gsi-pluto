@@ -407,7 +407,6 @@ Bool_t  PDataBase ::SetParamInt (Int_t key, const char*  paramname, Int_t * resu
     //return kFALSE if 1.) KEY not existing or 2.) Param not existing or 3.) Param not used for KEY
     if (!CheckEntry(key)) {
 	Error("SetParamInt","key %i not existing",key);
-	CRASH;
 	return kFALSE;
     }
     

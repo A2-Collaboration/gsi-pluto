@@ -33,7 +33,7 @@ ClassImp(PDecayChannel)
 // --------------------------------------------------------------------------
 PDecayChannel::~PDecayChannel() {
     delete Next;
-    Daughters.~TArrayI();
+    //Daughters.~TArrayI(); //TODOv6
 }
 // --------------------------------------------------------------------------
 

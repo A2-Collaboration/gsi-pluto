@@ -132,12 +132,15 @@ PBatch::PBatch() {
     fHisto3          =NULL;
     fGraph           =NULL;
     fGraph2D         =NULL;
+    is_readonly      =0;
+    slicesx = slicesy = NULL;
     current_particle =NULL;
 
     batch_particle_param = makeDataBase()->GetParamTObj("batch_particle");
     batch_models_param   = makeDataBase()->GetParamTObj("batch_models");
     batch_value_param    = makeDataBase()->GetParamDouble("batch_value");
-    pid_param            = makeDataBase()->GetParamInt("pid");
+    pid_param            = makeDataBase()->GetParamInt("batch_pid");
+    Int_t batch_position_param = makeDataBase()->GetParamInt("batch_position");
 
     if (batch_particle_param<0) 
 	batch_particle_param = 
@@ -150,6 +153,13 @@ PBatch::PBatch() {
     if (batch_models_param<0) 
 	batch_models_param = 
 	    makeDataBase()->MakeParamTObj("batch_models","Storage for distribution objects");
+
+    if (pid_param<0) 
+	pid_param = 
+	    makeDataBase()->MakeParamInt("batch_pid", "PID for batch");
+
+    if (batch_position_param<0) 
+	makeDataBase()->MakeParamInt("batch_position", "PID position for batch");
 
     batch_histogram_param = makeDataBase()->GetParamTObj("batch_histogram");
     if (batch_histogram_param<0) 
@@ -203,7 +213,6 @@ PBatch::PBatch() {
     key_branches  = NULL;
     locnum_branch = 0;
     else_position = -1;
-    //pid_param=base->GetParamInt("pid");
 }
 
 
@@ -808,6 +817,207 @@ Int_t PBatch::Execute(Int_t command_pos, Int_t retval) {
 
  	    if (!val) return retval;
  	    *val= myres;
+	} else if (lst_command[i] == COMMAND_GETRANDOM) {
+	    //
+	    // get a random number from the attached histogram
+	    //
+	    Double_t myres=0.;
+	    TH1 * my_fHisto1 = NULL;
+	    TH2 * my_fHisto2 = NULL;
+	    TH3 * my_fHisto3 = NULL;
+	    
+	    if (lst_key[1][i] == -1) {
+		//no external histo
+		my_fHisto1  = fHisto1;
+		my_fHisto2  = fHisto2;
+		my_fHisto3  = fHisto3;
+	    } else {
+		TObject *ret;
+		if (makeDataBase()->GetParamTObj(lst_key[1][i], batch_histogram_param, &ret)) {
+		    if (((TH1*)ret)->GetDimension() == 1 )
+			my_fHisto1 = (TH1*)ret;
+		    if (((TH1*)ret)->GetDimension() == 2 )
+			my_fHisto2 = (TH2*)ret;
+		    if (((TH1*)ret)->GetDimension() == 3 )
+			my_fHisto3 = (TH3*)ret;
+		}
+	    }
+
+	    //GetRandom()
+	    if (lst_key[2][i] == -1 && lst_key[3][i] == -1 && lst_key[4][i] == -1) {
+		if (!x) {
+		    return retval;
+		    }
+		if (my_fHisto1) {
+		    myres = my_fHisto1->GetRandom();
+		} else {
+		    if (!eval_err_dumped) {
+			eval_err_dumped=1;
+			Error("Execute","GetRandom() called, but no 1-dimensional histogram object present");
+		    }
+		    return retval;
+		}
+	    } else  { //GetRandom(x,y,z)
+		if (lst_key[2][i] != -1  && lst_key[3][i] == -1) { //1dim
+		    makeDataBase()->GetParamDouble (lst_key[2][i],batch_value_param, &val2);
+		    if (!val2) {
+			return retval;
+		    }
+		    if (my_fHisto1) {
+			myres = my_fHisto1->GetRandom();
+			*val2 = myres;
+		    } else {
+			if (!eval_err_dumped) {
+			    eval_err_dumped=1;
+			    Error("Execute","GetRandom(x) called, but no TH1 object present");
+			}
+			return retval;
+		    }
+		} else if (lst_key[2][i] != -1  && lst_key[3][i] != -1 && lst_key[4][i] == -1) { //2dim
+		    makeDataBase()->GetParamDouble (lst_key[2][i],batch_value_param, &val2);
+		    makeDataBase()->GetParamDouble (lst_key[3][i],batch_value_param, &val3);
+		    if (!val2 || !val3) {
+			return retval;
+		    }
+		    if (my_fHisto2) {
+			my_fHisto2->GetRandom2(*val2,*val3);
+			myres = 0;
+		    } else {
+			if (!eval_err_dumped) {
+			    eval_err_dumped=1;
+			    Error("Execute","GetRandom(x,y) called, but no TH2 object present");
+			}
+			return retval;
+		    }
+		} else  { //3dim
+		    makeDataBase()->GetParamDouble (lst_key[2][i],batch_value_param, &val2);
+		    makeDataBase()->GetParamDouble (lst_key[3][i],batch_value_param, &val3);
+		    makeDataBase()->GetParamDouble (lst_key[4][i],batch_value_param, &val4);
+		    
+		    if (!val2 || !val3 || !val4) {
+			return retval;
+		    }
+		    if (my_fHisto3) {
+			my_fHisto3->GetRandom3(*val2,*val3,*val4);
+			myres = 0;
+		    } else {
+			if (!eval_err_dumped) {
+			    eval_err_dumped=1;
+			    Error("Execute","GetRandom(x,y,z) called, but no TH3 object present");
+			}
+			return retval;
+		    }
+		}
+	    }
+
+ 	    makeDataBase()->GetParamDouble (lst_key_a[i],batch_value_param, &val);
+
+ 	    if (!val) return retval;
+ 	    *val= myres;
+	} else if (lst_command[i] == COMMAND_GETRANDOMX) {
+	    //
+	    // get a random number from the attached histogram
+	    //
+	    Double_t myres=0.;
+	    TH2 * my_fHisto2 = NULL;
+	    
+	    if (lst_key[1][i] == -1) {
+		//no external histo
+		my_fHisto2  = fHisto2;
+	    } else {
+		TObject *ret = NULL;
+		if (makeDataBase()->GetParamTObj(lst_key[1][i], batch_histogram_param, &ret)) {
+		    if (((TH1*)ret)->GetDimension() == 2 )
+			my_fHisto2 = (TH2*)ret;
+		}
+	    }
+	    makeDataBase()->GetParamDouble (lst_key[2][i],batch_value_param, &val2);
+	    if (!val2) {
+		return retval;
+	    }
+	    if (my_fHisto2) {
+		int n_x = my_fHisto2->GetNbinsX();
+		int n_y = my_fHisto2->GetNbinsY();
+		
+		if (!slicesy) { //first time call
+		    slicesy = new TH1D*[n_y];
+		    for (int i=0;i<n_y;i++) {
+			slicesy[i] = new TH1D(Form("%s_y_%i",my_fHisto2->GetName(), i), "Projected", 
+					      n_x, my_fHisto2->GetXaxis()->GetXmin(), my_fHisto2->GetXaxis()->GetXmax());
+			slicesy[i]->SetDirectory(0);
+			for (int j=0;j<n_x;j++) {
+			    slicesy[i]->SetBinContent(j+1, my_fHisto2->GetBinContent(j+1, i+1));
+			}
+		    }
+		}
+		int ypos = my_fHisto2->GetYaxis()->FindBin(*val2);
+		makeDataBase()->GetParamDouble (lst_key_a[i],batch_value_param, &val);
+		if (!val) return retval;
+		if (ypos > 0 && ypos <= n_y) {
+		    myres = slicesy[ypos-1]->GetRandom();
+		    *val = myres;
+		} else {
+		    *val = 0;
+		}
+	    } else {
+		if (!eval_err_dumped) {
+		    eval_err_dumped=1;
+		    Error("Execute","GetRandomX(y) called, but no TH2 object present");
+		}
+		return retval;
+	    }
+	} else if (lst_command[i] == COMMAND_GETRANDOMY) {
+	    //
+	    // get a random number from the attached histogram
+	    //
+	    Double_t myres=0.;
+	    TH2 * my_fHisto2 = NULL;
+	    
+	    if (lst_key[1][i] == -1) {
+		//no external histo
+		my_fHisto2  = fHisto2;
+	    } else {
+		TObject *ret = NULL;
+		if (makeDataBase()->GetParamTObj(lst_key[1][i], batch_histogram_param, &ret)) {
+		    if (((TH1*)ret)->GetDimension() == 2 )
+			my_fHisto2 = (TH2*)ret;
+		}
+	    }
+	    makeDataBase()->GetParamDouble (lst_key[2][i],batch_value_param, &val2);
+	    if (!val2) {
+		return retval;
+	    }
+	    if (my_fHisto2) {
+		int n_x = my_fHisto2->GetNbinsX();
+		int n_y = my_fHisto2->GetNbinsY();
+		
+		if (!slicesx) { //first time call
+		    slicesx = new TH1D*[n_x];
+		    for (int i=0;i<n_x;i++) {
+			slicesx[i] = new TH1D(Form("%s_x_%i",my_fHisto2->GetName(), i), "Projected", 
+					      n_y, my_fHisto2->GetYaxis()->GetXmin(), my_fHisto2->GetYaxis()->GetXmax());
+			slicesx[i]->SetDirectory(0);
+			for (int j=0;j<n_y;j++) {
+			    slicesx[i]->SetBinContent(j+1, my_fHisto2->GetBinContent(i+1, j+1));
+			}
+		    }
+		}
+		int xpos = my_fHisto2->GetXaxis()->FindBin(*val2);
+		makeDataBase()->GetParamDouble (lst_key_a[i],batch_value_param, &val);
+		if (!val) return retval;
+		if (xpos > 0 && xpos <= n_x) {
+		    myres = slicesx[xpos-1]->GetRandom();
+		    *val = myres;
+		} else {
+		    *val = 0;
+		}
+	    } else {
+		if (!eval_err_dumped) {
+		    eval_err_dumped=1;
+		    Error("Execute","GetRandomY(x) called, but no TH2 object present");
+		}
+		return retval;
+	    }
 	} else if (lst_command[i] == COMMAND_IF) {
 	    //
 	    // if (....)
@@ -1463,6 +1673,7 @@ Bool_t PBatch::AddCommand(char * command) {
 	    if (AddCommand(COMMAND_EVAL,key_a,-1,-1)) {
 		Double_t * delme =  new Double_t(0.);
 		makeDataBase()->SetParamDouble(key_a ,"batch_value", delme);
+		is_readonly=1;
 		return kTRUE;
 	    }
 	    return kFALSE;
@@ -1491,45 +1702,79 @@ Bool_t PBatch::AddCommand(char * command) {
 	    if (AddCommand(COMMAND_EVAL,key_a,-1,key2,key3,key4)) {
 		Double_t * delme =  new Double_t(0.);
 		makeDataBase()->SetParamDouble(key_a ,"batch_value", delme);
+		is_readonly=1;
 		return kTRUE;
 	    }
 	    return kFALSE;
 	} 
-#if 0
-	//not yet concluded!!!!
+
 	if (!strncmp(command,"GetRandom()",11) || !strncmp(command,"getrandom()",11)) {
 	    key_a = makeStaticData()->
 		MakeDirectoryEntry("batch_objects",NBATCH_NAME,LBATCH_NAME,command3);
 	    if (AddCommand(COMMAND_GETRANDOM, key_a, -1, -1)) {
 		Double_t * delme =  new Double_t(0.);
 		makeDataBase()->SetParamDouble(key_a ,"batch_value", delme);
+		is_readonly=1;
 		return kTRUE;
 	    }
 	    return kFALSE;
-	} else if (!strncmp(command,"GetRandom(",10) || !strncmp(command,"GetRandom(",10)) {
+	} else if (!strncmp(command,"GetRandom(",10) || !strncmp(command,"getrandom(",10)) {
 	    //Exists also as method!!!
 	    char *prodx[10];
 	    Int_t prodx_s=10; //max 10 products (but problems catched below)
 	    
 	    PUtils::Tokenize(command+10, ",", prodx, &prodx_s);
-	    if (prodx_s>1) {
-		Warning("AddCommand","Maximum 1 argument for GetRandom()");
+	    if (prodx_s>3) {
+		Warning("AddCommand","Maximum 3 arguments for GetRandom()");
 	    } 
-	    *(prodx[0]+strlen(prodx[0])-1) = '\0'; //remove trailing )
+	    *(prodx[prodx_s-1]+strlen(prodx[prodx_s-1])-1) = '\0'; //remove trailing )
 	    
-	    key2 = GetKey(prodx[0],1,-1);
+	    int key3=-1,key4=-1;
+	    if (prodx_s>0) 
+		key2 = GetKey(prodx[0],1,-1);
+	    if (prodx_s>1) 
+		key3 = GetKey(prodx[1],1,-1);
+	    if (prodx_s>2) 
+		key4 = GetKey(prodx[2],1,-1);
 	    	    
 	    key_a = makeStaticData()->
 		MakeDirectoryEntry("batch_objects",NBATCH_NAME,LBATCH_NAME,command3);
 	    
-	    if (AddCommand(COMMAND_GETRANDOM, key_a, -1, key2, -1, -1)) {
+	    if (AddCommand(COMMAND_GETRANDOM, key_a, -1, key2, key3, key4)) {
 		Double_t * delme =  new Double_t(0.);
 		makeDataBase()->SetParamDouble(key_a ,"batch_value", delme);
+		is_readonly=1;
 		return kTRUE;
 	    }
 	    return kFALSE;
 	} 
-#endif
+
+	if (!strncmp(command,"GetRandomX",10) || !strncmp(command,"getrandomx",10)) {
+	    key_a = makeStaticData()->
+		MakeDirectoryEntry("batch_objects",NBATCH_NAME,LBATCH_NAME,command3);
+	    key2 = GetKey(command+10,1,-1);
+	    if (AddCommand(COMMAND_GETRANDOMX, key_a, -1, key2)) {
+		Double_t * delme =  new Double_t(0.);
+		makeDataBase()->SetParamDouble(key_a ,"batch_value", delme);
+		is_readonly=1;
+		return kTRUE;
+	    }
+	    return kFALSE;
+	} 
+
+	if (!strncmp(command,"GetRandomY",10) || !strncmp(command,"getrandomy",10)) {
+	    key_a = makeStaticData()->
+		MakeDirectoryEntry("batch_objects",NBATCH_NAME,LBATCH_NAME,command3);
+	    key2 = GetKey(command+10,1,-1);
+	    if (AddCommand(COMMAND_GETRANDOMY, key_a, -1, key2)) {
+		Double_t * delme =  new Double_t(0.);
+		makeDataBase()->SetParamDouble(key_a ,"batch_value", delme);
+		is_readonly=1;
+		return kTRUE;
+	    }
+	    return kFALSE;
+	} 
+
 	if (!strncmp(command,"cos(",4)) {
 	    key_a = makeStaticData()->
 		MakeDirectoryEntry("batch_objects",NBATCH_NAME,LBATCH_NAME,command3);
@@ -2173,12 +2418,16 @@ Bool_t PBatch::AddCommand(char * command) {
  	    
 	}
 
-	//cout << is_value_result_type << " .... "<< is_obj_result_type << endl;
+	//cout << key_a << ":" << is_value_result_type << ":"<< is_obj_result_type << endl;
 
 	if (is_obj_result_type) {
 	    TObject * delme;
 	    if (!makeDataBase()->GetParamTObj (key_a,"batch_particle",&delme)) {
-		TObject * delme =  (TObject *) (new PParticle(0,0,0,0));
+		PParticle *newparticle = new PParticle(0,0,0,0);
+		//pid existing? If yes, use it
+		Int_t oldpid = makeStaticData()->GetParticleIDByKey(key_a);
+		if (oldpid >=0) newparticle->SetID(oldpid);
+		TObject * delme =  (TObject *) newparticle;
 		makeDataBase()->SetParamTObj (key_a ,"batch_particle", delme);
 	    }
 	    
@@ -2778,7 +3027,7 @@ Int_t PBatch::GetKey(char * name, int fl, int makeflag) {
 	    
 	    Int_t *ii=new int(pid);  //never destructed, but called only once!
 	   	
-	    if (!makeDataBase()->SetParamInt (key, "pid", ii)) {
+	    if (!makeDataBase()->SetParamInt (key, "batch_pid", ii)) {
 		delete ii;
 		return kFALSE;
 	    }
@@ -2817,9 +3066,8 @@ Int_t PBatch::GetKey(char * name, int fl, int makeflag) {
 			status=1;
 		    }
 		} else Error("AddCommand","[%s] Unknown value '%s'",name,arg2);
-		//mis-use link:
 		//cout << "delme: " << *delme << endl;
-		makeDataBase()->SetParamInt (key ,"link", delme);
+		makeDataBase()->SetParamInt (key ,"batch_position", delme);
 	    }
 	    makeflag = 0;
 	}
