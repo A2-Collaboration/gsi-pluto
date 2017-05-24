@@ -129,7 +129,7 @@ Bool_t PDensityMatrix::ReadDensityMatrix(char *filename, Int_t dim, Bool_t use_b
     //uses the values f2 as defined above
 
     if (pluto_global::verbosity) {
-        Info("ReadDensityMatrix", "Analysing the file...");
+    Info("ReadDensityMatrix", "Analysing the file...");
     }
 
     Double_t  numbers[16];
@@ -218,19 +218,19 @@ Bool_t PDensityMatrix::ReadDensityMatrix(char *filename, Int_t dim, Bool_t use_b
     }
 
     if (pluto_global::verbosity) {
-        if (!found_single_numbers)
-            Info("ReadDensityMatrix", "...done (no sections found)");
-        else
-            Info("ReadDensityMatrix", "...done");
+    if (!found_single_numbers) 
+	Info("ReadDensityMatrix", "...done (no sections found)");
+    else
+	Info("ReadDensityMatrix", "...done");
 
-        Info("ReadDensityMatrix", "Dimension 1 (_x) has %i bins within the range [%f,%f]",
-             axes_size[0], (axes[0])[0], (axes[0])[axes_size[0]-1]);
-        if (dimension > 1)
-            Info("ReadDensityMatrix", "Dimension 2 (_y) has %i bins within the range [%f,%f]",
-                 axes_size[1], (axes[1])[0], (axes[1])[axes_size[1]-1]);
-        if (dimension > 2)
-            Info("ReadDensityMatrix", "Dimension 3 (_z) has %i bins within the range [%f,%f]",
-                 axes_size[2], (axes[2])[0], (axes[2])[axes_size[2]-1]);
+    Info("ReadDensityMatrix", "Dimension 1 (_x) has %i bins within the range [%f,%f]", 
+	 axes_size[0], (axes[0])[0], (axes[0])[axes_size[0]-1]);
+    if (dimension > 1)
+	Info("ReadDensityMatrix", "Dimension 2 (_y) has %i bins within the range [%f,%f]", 
+	     axes_size[1], (axes[1])[0], (axes[1])[axes_size[1]-1]);
+    if (dimension > 2)
+	Info("ReadDensityMatrix", "Dimension 3 (_z) has %i bins within the range [%f,%f]", 
+	     axes_size[2], (axes[2])[0], (axes[2])[axes_size[2]-1]);
     }
 
     //TODO: check axis size against dim and DENSITYMATRIX_MAX_MATRICES
@@ -258,34 +258,34 @@ Bool_t PDensityMatrix::ReadDensityMatrix(char *filename, Int_t dim, Bool_t use_b
     //now filling the content
     file = fopen(filename,"r");
     while(fgets (line, sizeof line, file) != NULL) {
-        line_number = 0;
-        numargs = sscanf(line, "%le %le %le %le %le %le %le %le %le %le %le %le %le %le %le %le\n",
-                         &(numbers[0]), &(numbers[1]), &(numbers[2]), &(numbers[3]), &(numbers[4]),
-                &(numbers[5]), &(numbers[6]), &(numbers[7]), &(numbers[8]), &(numbers[9]),
-                &(numbers[10]), &(numbers[11]), &(numbers[12]), &(numbers[13]), &(numbers[14]),
-                &(numbers[15]));
-
-        if (numargs == 1) {
-            if (numbers[0] >= min_selection && numbers[0] <= max_selection) {
+	line_number = 0;
+	numargs = sscanf(line, "%le %le %le %le %le %le %le %le %le %le %le %le %le %le %le %le\n",
+			 &(numbers[0]), &(numbers[1]), &(numbers[2]), &(numbers[3]), &(numbers[4]), 
+			 &(numbers[5]), &(numbers[6]), &(numbers[7]), &(numbers[8]), &(numbers[9]), 
+			 &(numbers[10]), &(numbers[11]), &(numbers[12]), &(numbers[13]), &(numbers[14]), 
+			 &(numbers[15]));
+	
+	if (numargs == 1) {
+	    if (numbers[0] >= min_selection && numbers[0] <= max_selection) {
                 if (pluto_global::verbosity) {
-                    Info("ReadDensityMatrix", "Found section [%f], reading...", numbers[0]);
+		Info("ReadDensityMatrix", "Found section [%f], reading...", numbers[0]);
                 }
-                found_selection = kTRUE;
-            } else {
+		found_selection = kTRUE;
+	    } else {
                 if (pluto_global::verbosity) {
-                    Info("ReadDensityMatrix", "Found section [%f], skipped!", numbers[0]);
+		Info("ReadDensityMatrix", "Found section [%f], skipped!", numbers[0]);
                 }
-                found_selection = kFALSE;
-            }
-        } else if (found_selection) {
-            for (int i=0; i<dim; i++) {
-                x[i] = numbers[i];
-            }
-            GetBin(x, bins);
-            for (int i=0; i<num_matrices; i++) {
-                (matrix[i])[bins[0] + bins[1]*axes_size[0] + bins[2]*axes_size[1]*axes_size[0]] += numbers[i+dim];
-            }
-        }
+		found_selection = kFALSE;
+	    }
+	} else if (found_selection) {
+	    for (int i=0; i<dim; i++) {
+		x[i] = numbers[i];
+	    }
+	    GetBin(x, bins);
+	    for (int i=0; i<num_matrices; i++) {
+		(matrix[i])[bins[0] + bins[1]*axes_size[0] + bins[2]*axes_size[1]*axes_size[0]] += numbers[i+dim];
+	    }
+	}
     }
 
     //next step is to fill the integral

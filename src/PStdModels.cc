@@ -27,7 +27,7 @@ PStdModels::PStdModels() {
     generic_physics_done = kFALSE;
 
     if (pluto_global::verbosity >= 3) {
-        Info("PStdModels()","(%s), Standard model filler", PRINT_CTOR);
+    Info("PStdModels()","(%s), Standard model filler", PRINT_CTOR);
     }
 
 }
@@ -513,7 +513,7 @@ TObjArray * PStdModels::GetModels(void) {
     arr=new TObjArray();
 
     if (pluto_global::verbosity) {
-        Info("GetModels","Read std models");
+    Info("GetModels","Read std models");
     }
 
     /***********************************************

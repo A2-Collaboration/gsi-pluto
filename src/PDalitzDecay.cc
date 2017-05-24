@@ -280,8 +280,8 @@ Bool_t PDalitzDecay::GetWidth(Double_t mass, Double_t *width, Int_t didx) {
 
 #ifdef INGO_DEBUG
     if (pluto_global::verbosity >= 3) {
-        Info("GetWidth","Creating mesh in %s (%f,%f)",makeStaticData()-> GetDecayName(is_channel),
-             mass_threshold,mass_ceiling);
+	Info("GetWidth","Creating mesh in %s (%f,%f)",makeStaticData()-> GetDecayName(is_channel),
+	     mass_threshold,mass_ceiling);
     }
 #endif
     

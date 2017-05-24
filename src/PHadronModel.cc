@@ -89,8 +89,8 @@ Bool_t PHadronModel::GetWidth(Double_t mass, Double_t *width, Int_t didx) {
 	dm=(mmax-mmin)/(maxmesh-3.); // mass increment for the mesh
  
     if (pluto_global::verbosity >= 3) {
-        Info("GetWidth","Width 1st call for %s, mass range %f GeV to %f GeV",
-             description,mmin,mmax);
+	Info("GetWidth","Width 1st call for %s, mass range %f GeV to %f GeV",
+	     description,mmin,mmax);
     }
 
 	while (self_consistency_loop) {

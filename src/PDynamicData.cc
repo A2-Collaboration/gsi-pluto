@@ -53,7 +53,7 @@ PDynamicData::PDynamicData() {
     enhance_br_param = base->GetParamDouble ("enhance_br");
 
     if (pluto_global::verbosity >= 3) {
-        Info("PDynamicData()","(%s)", PRINT_CTOR);
+    Info("PDynamicData()","(%s)", PRINT_CTOR);
     }
     
   

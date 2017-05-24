@@ -359,7 +359,7 @@ PParticle & PParticle::operator += ( const PParticle & p) {
     qParticle1 = new PParticle(this); 
     qParticle2 = new PParticle(p);
     if (pluto_global::verbosity >= 3) {
-        Info("operator+","(%s) Keeping beam and target particle for further reference", PRINT_AUTO_ALLOC);
+    Info("operator+","(%s) Keeping beam and target particle for further reference", PRINT_AUTO_ALLOC);
     }
     make_new_qParticle=kTRUE;
     if (makeDataBase()->GetEntryInt("pid", id2+ID())<0) {
@@ -378,10 +378,10 @@ PParticle & PParticle::operator += ( const PParticle & p) {
 		    makeStaticData()->GetParticleName(p.ID()));
 	    makeStaticData()->AddAlias(delme,delme2);
         if (pluto_global::verbosity) {
-            Info("operator+","(%s) The composite %s has been added",
-                 PRINT_AUTO_ALLOC,makeStaticData()->GetParticleName(id2+ID()));
-        }
+	    Info("operator+","(%s) The composite %s has been added", 
+		 PRINT_AUTO_ALLOC,makeStaticData()->GetParticleName(id2+ID()));
 	}
+    }
     }
 
     SetSibling(NULL);
@@ -434,10 +434,10 @@ void PParticle::Scatter(PParticle *p1, PParticle *p2) {
 		    makeStaticData()->GetParticleName(id2));
 	    makeStaticData()->AddAlias(delme,delme2);
         if (pluto_global::verbosity) {
-            Info("Scatter","(%s) The composite %s has been added",
-                 PRINT_AUTO_ALLOC,makeStaticData()->GetParticleName(pid));
-        }
+	    Info("Scatter","(%s) The composite %s has been added", 
+		 PRINT_AUTO_ALLOC,makeStaticData()->GetParticleName(pid));
 	}
+    }
     }
 
     SetSibling(NULL);

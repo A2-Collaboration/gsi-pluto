@@ -423,7 +423,7 @@ void PChannel::IdChannel() {
     //the dummy composite
     
     if (pluto_global::verbosity) {
-        Info("IdChannel","(%s) Quasi-free production", PRINT_AUTO_ALLOC);
+    Info("IdChannel","(%s) Quasi-free production", PRINT_AUTO_ALLOC);
     }
 
     n--;

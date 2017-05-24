@@ -260,7 +260,7 @@ Bool_t PReaction:: parse_script (char * command,
     // "_T1=1.5; _theta=2*TMath::DegToRad();"
     //                     -> Beam inclination of 2 deg
 
-
+  
     r_beam=beam,r_target=target;
     reaction_string=reaction;
     makeDistributionManager()->DisableAddWarning();
@@ -341,10 +341,10 @@ Bool_t PReaction:: parse_script (char * command,
 	pt.RotateZ(beam_phi1);
 
     if (pluto_global::verbosity >= 5) {
-        cout << "<Beam>" << endl;
-        pb.Print();
-        cout << "<Target>" << endl;
-        pt.Print();
+	cout << "<Beam>" << endl;
+	pb.Print();	
+	cout << "<Target>" << endl;
+	pt.Print();
     }
 
 	PParticle *q = new PParticle(pb+pt);

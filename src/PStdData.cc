@@ -45,7 +45,7 @@ PStdData * makeStdData()
 
 PStdData::PStdData() {
     if (pluto_global::verbosity >= 3) {
-        Info("PStdData()","(%s)", PRINT_CTOR);
+    Info("PStdData()","(%s)", PRINT_CTOR);
     }
     
     disable=0;

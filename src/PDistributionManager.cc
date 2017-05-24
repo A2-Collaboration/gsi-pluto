@@ -68,7 +68,7 @@ PDistributionManager::PDistributionManager() {
     SetGroup("user");
 
     if (pluto_global::verbosity >= 3) {
-        Info("PDistributionManager()","(%s)", PRINT_CTOR);
+    Info("PDistributionManager()","(%s)", PRINT_CTOR);
     }
 
 }
@@ -95,9 +95,9 @@ void PDistributionManager::ActivateStdModels(void) {
 	//Add(makeStdModels()->GetModels());
 	std_models->Add(pdmutil);
 
-    pdmutil->no_warning=kFALSE;
+        pdmutil->no_warning=kFALSE;
     if (pluto_global::verbosity) {
-        Info("Attach","Re-iteration of std plugin done");
+	Info("Attach","Re-iteration of std plugin done");
     }
 	pdmutil->LinkDB(); 
     }    
@@ -124,33 +124,33 @@ Bool_t PDistributionManager::AddPlugin(PDistributionCollection *plugin) {
 Bool_t PDistributionManager::Activate(const char * name) {
     //is model existing?
     if (!GetDistribution(name)) {
-        Warning("Activate","plugin %s does not exist",name);
-        return kFALSE;
+	Warning("Activate","plugin %s does not exist",name);
+	return kFALSE;
     }
     //first check if model is already activated
     if (GetDistribution(name)->GetEnable() && GetDistribution(name)->GetActivated()) return kTRUE;
     
     for (int i=0;i<collect_pointer;i++) {
-        if (strcmp(name,collect[i]->GetIdentifier()) == 0) {
-            //first we check the dependencies
-            Int_t pointer =0;
-            const char * depname=NULL;
-            while ((depname=collect[i]->GetDependency(&pointer))!=NULL) {
-                //Activate(depname);
-                Exec(depname);
-            }
-            if (collect[i]->Activate()) {
+	if (strcmp(name,collect[i]->GetIdentifier()) == 0) {
+	    //first we check the dependencies
+	    Int_t pointer =0;
+	    const char * depname=NULL;
+	    while ((depname=collect[i]->GetDependency(&pointer))!=NULL) {
+		//Activate(depname);
+		Exec(depname);
+	    }
+	    if (collect[i]->Activate()) {
                 if (pluto_global::verbosity) {
-                    Info("Exec","Plugin <%s> activated",name);
+		Info("Exec","Plugin <%s> activated",name);
                 }
-                collect[i]->SetEnable(1);
-                collect[i]->SetActivated(1);
-                SetGroup("user");
-                return kTRUE;
-            }
-            Warning("Activate","plugin %s could not be activated",name);
-            return kFALSE;
-        }
+		collect[i]->SetEnable(1);
+		collect[i]->SetActivated(1);
+		SetGroup("user");
+		return kTRUE;
+	    }
+	    Warning("Activate","plugin %s could not be activated",name);
+	    return kFALSE;
+	}
     }
     Warning("Activate","plugin %s does not exist",name);
     return kFALSE;
@@ -218,14 +218,14 @@ Bool_t PDistributionManager::Exec(const char * command) {
 
 void PDistributionManager::PluginInfo(const char * info) {
     if (pluto_global::verbosity) {
-        Info("PDistributionManager",info);
+    Info("PDistributionManager",info);
     }
 }
 
 
 Bool_t PDistributionManager::Startup(char * command) {
     if (!batch) 
-        batch = new PBatch;
+	batch = new PBatch;
     batch->AddCommand(command);
     return kTRUE;
 };

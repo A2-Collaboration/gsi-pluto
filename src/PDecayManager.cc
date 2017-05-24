@@ -148,7 +148,7 @@ PDecayManager::PDecayManager() {
     pdist =makeDistributionManager(); //create static object, if not yet done
 
     if (pluto_global::verbosity >= 3) {
-        Info("PDecayManager()","(%s)", PRINT_CTOR);
+    Info("PDecayManager()","(%s)", PRINT_CTOR);
     }
 
     fileoutput_pos = 0;

@@ -183,7 +183,7 @@ Bool_t PAdaptiveMeshN::GetRandom() {
  	bin->SetYMax(y_random);
 
     if (pluto_global::verbosity) {
-        cout << "recalc" << endl;
+ 	cout << "recalc" << endl;
     }
 
  	ReCalc();
@@ -480,7 +480,7 @@ void PAdaptiveMeshN::ReCalcYMax(void) {
     }
 
     if (pluto_global::verbosity) {
-        cout << "y_max" << y_max << endl;
+    cout << "y_max" << y_max << endl;
     }
 
 }
