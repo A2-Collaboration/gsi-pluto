@@ -379,7 +379,8 @@ Bool_t PProjector::AddInputTNtuple(TNtuple * n,const  char * command) {
 	Double_t *val;
 	if (!makeDataBase()->GetParamDouble(key_list_in[batch_pos-1][key_pos_in[batch_pos-1]] ,batch_value_param,&val)) {
 	    Double_t * delme =  new Double_t(0.);
-        makeDataBase()->SetParamDouble(key_list_in[batch_pos-1][key_pos_in[batch_pos-1]],"batch_value", delme);
+	    makeDataBase()->SetParamDouble(key_list_in[batch_pos-1][key_pos_in[batch_pos-1]],"batch_value", delme);
+	    //cout << "Added double to " << name << endl;
 	}
 
 	//Set the branch adress to the floats
@@ -399,51 +400,52 @@ Int_t  PProjector::SetParticles(PParticle ** mstack, int *decay_done, int * num,
     Int_t listkey=-1,*i_result,new_particles=0,counter_all=0,particle_key;
 
     if (first_time) {
-        for (int i=0;i<*num;i++) {
-            //cout << "FT:" << i << ":" << mstack[i]->ID() << endl;
-            //Delete old default pos list
-            // Reset value on 1st call -> BUGBUG: can cause trouble when jumping over 2 projectors
-            particle_key = makeStaticData()->GetParticleKey(mstack[i]->ID());
-            if (makeDataBase()->GetParamInt (particle_key, stream_default_pos_param ,&i_result)) {
-                (*i_result)=0;
-            }
-        }
-        particle_key = makeStaticData()->GetParticleKey(0); //DUMMY=all particles
-        if (makeDataBase()->GetParamInt (particle_key, stream_default_pos_param ,&i_result)) {
-            (*i_result)=0;
-        }
-        for (int i=0;i<*num;i++) {
-            //Delete old max pos list
-            particle_key = makeStaticData()->GetParticleKey(mstack[i]->ID());
-            if (makeDataBase()->GetParamInt (particle_key, stream_max_pos_param ,&i_result)) {
-                (*i_result)=0;
-            }
-        }
-        particle_key = makeStaticData()->GetParticleKey(0); //DUMMY=all particles
-        if (makeDataBase()->GetParamInt (particle_key, stream_max_pos_param ,&i_result)) {
-            (*i_result)=0;
-        }
-        for (int i=0;i<*num;i++) {
-            //Create max list
-            if (mstack[i]->IsActive()) { //count only active particles
-                particle_key = makeStaticData()->GetParticleKey(mstack[i]->ID());
-                if (makeDataBase()->GetParamInt (particle_key, stream_max_pos_param ,&i_result)) {
-                    (*i_result)++;
-                } else {
-                    Int_t * dummy = new Int_t(1);
-                    makeDataBase()->SetParamInt(particle_key ,STREAM_MAX_POS, dummy);
-                }
-                particle_key = makeStaticData()->GetParticleKey(0); //DUMMY=all particles
-                if (makeDataBase()->GetParamInt (particle_key, stream_max_pos_param ,&i_result)) {
-                    (*i_result)++;
-                } else {
-                    Int_t * dummy = new Int_t(1);
-                    makeDataBase()->SetParamInt(particle_key ,STREAM_MAX_POS, dummy);
-                }
-                counter_all++;
-            }
-            mstack[i]->SetScatterClone(kFALSE); //disable making clones when copy constructor is called -> memory leak
-        }
+ 	for (int i=0;i<*num;i++) {
+	    //cout << "FT:" << i << ":" << mstack[i]->ID() << endl;
+ 	    //Delete old default pos list
+	    // Reset value on 1st call -> BUGBUG: can cause trouble when jumping over 2 projectors
+ 	    particle_key = makeStaticData()->GetParticleKey(mstack[i]->ID());
+ 	    if (makeDataBase()->GetParamInt (particle_key, stream_default_pos_param ,&i_result)) {
+ 		(*i_result)=0;
+ 	    } 
+ 	}
+	particle_key = makeStaticData()->GetParticleKey(0); //DUMMY=all particles
+	if (makeDataBase()->GetParamInt (particle_key, stream_default_pos_param ,&i_result)) {
+	    (*i_result)=0;
+	} 
+	for (int i=0;i<*num;i++) {
+ 	    //Delete old max pos list
+ 	    particle_key = makeStaticData()->GetParticleKey(mstack[i]->ID());
+ 	    if (makeDataBase()->GetParamInt (particle_key, stream_max_pos_param ,&i_result)) {
+ 		(*i_result)=0;
+ 	    } 
+ 	}
+	particle_key = makeStaticData()->GetParticleKey(0); //DUMMY=all particles
+	if (makeDataBase()->GetParamInt (particle_key, stream_max_pos_param ,&i_result)) {
+	    (*i_result)=0;
+	} 
+	for (int i=0;i<*num;i++) {
+	    //Create max list
+	    if (mstack[i]->IsActive()) { //count only active particles
+		particle_key = makeStaticData()->GetParticleKey(mstack[i]->ID());
+		if (makeDataBase()->GetParamInt (particle_key, stream_max_pos_param ,&i_result)) {
+		    (*i_result)++;
+		} else {
+		    Int_t * dummy = new Int_t(1);
+		    makeDataBase()->SetParamInt(particle_key ,STREAM_MAX_POS, dummy);
+		}
+		particle_key = makeStaticData()->GetParticleKey(0); //DUMMY=all particles
+		if (makeDataBase()->GetParamInt (particle_key, stream_max_pos_param ,&i_result)) {
+		    (*i_result)++;
+		} else {
+		    Int_t * dummy = new Int_t(1);
+		    makeDataBase()->SetParamInt(particle_key ,STREAM_MAX_POS, dummy);
+		}
+		counter_all++;
+	    }
+	    mstack[i]->SetScatterClone(kFALSE); //disable making clones when copy constructor is called -> memory leak
+	} 
+	//cout << "counted max " << counter_all << endl;
     }//END first_time
 
 
@@ -654,9 +656,12 @@ Bool_t PProjector::Modify(PParticle ** mstack, int *decay_done, int * num, int s
 	    if ( (*(current_size_branches[batch[i]->GetBranch()-1])) >= stacksize) {
 		Warning("Modify (kPUSHBRANCH)","Stack size too small, increase '_system_particle_stacksize'");
 		return kTRUE;
-        }
+	    }
+	    //cout << (particle_array_branches[batch[i]->GetBranch()-1]) << endl;
+	    //cout << *(current_size_branches[batch[i]->GetBranch()-1]) << endl;
 	    
-        if (batch[i]->GetCurrentParticle()) {
+	    if (batch[i]->GetCurrentParticle()) {
+		//cout << (particle_array_branches[batch[i]->GetBranch()-1])
 		//  [*(current_size_branches[batch[i]->GetBranch()-1])] << endl;
 		*((particle_array_branches[batch[i]->GetBranch()-1])
 		  [*(current_size_branches[batch[i]->GetBranch()-1])] )
@@ -682,7 +687,8 @@ Bool_t PProjector::Modify(PParticle ** mstack, int *decay_done, int * num, int s
         }
 	    return kFALSE;
 	} else if (retval & kFOREACH) {
-        startcommand = batch[i]->GetNewCommand();
+	    startcommand = batch[i]->GetNewCommand();
+	    //cout << "startcommand " << startcommand << endl;
 	    i -= 1; //redo current loop
 	    SetParticles(mstack, decay_done, num, stacksize, 0);  //reset particles like for "formore"
 	    retval &= ~kFOREACHEND;
@@ -690,7 +696,8 @@ Bool_t PProjector::Modify(PParticle ** mstack, int *decay_done, int * num, int s
 	    //if something failed, try to get the else
 	    if (batch[i]->GetElsePosition()>-1 &&  //only if else is provided
 		batch[i]->GetCurrentPosition() < batch[i]->GetElsePosition() ) { //avoid deadlocks
-        startcommand = batch[i]->GetElsePosition();
+		startcommand = batch[i]->GetElsePosition();
+		//cout << "startcommand " << startcommand << endl;
 		i -=1; //stay in same batch		
 	    }
 	}

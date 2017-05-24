@@ -182,6 +182,7 @@ Bool_t PAngularDistribution::Init(void) {
 	(angles1 || anglesh || anglesg))              // Only 1dim-sampling
 	direct_sampling_possible=kTRUE;
     //N.B. this is overwritten by inherited models (e.g.PDeltaAngularDistribution)
+    //cout << direct_sampling_possible << endl;
     return kTRUE;    
 };
 
@@ -196,6 +197,7 @@ Bool_t PAngularDistribution::Finalize(void) {
 };
 
 Bool_t PAngularDistribution::CheckAbort(void) {
+    //    cout << check_abort << endl;
     if (never_abort) return kFALSE;
     return check_abort;
 };
@@ -209,13 +211,25 @@ Bool_t PAngularDistribution::SampleAngle(void) {
 
     if (!direct_sampling_possible) return kFALSE;
 
+     // primary->Print();
+     // for (int i=0;i<n_daughters;i++) daughter[i]->Print();
+
     if (!Rotate(1)) return kFALSE;    
+
+      // cout << "---" << endl;
+      // primary_tmp.Print();
+      // for (int i=0;i<n_daughters;i++) daughter[i]->Print();
+      // cout << "*********************" << endl;
 
     //now we rotate all daughters such that primary_tmp is pointing to the z-axis
     double prim_phi   = primary_tmp.Phi();
     double prim_theta = primary_tmp.Theta();
 
 #if 1
+
+    //primary->Print();
+    // primary_tmp.Print();
+    // for (int i=0;i<n_daughters;i++) daughter[i]->Print();
 
     primary_tmp.RotateZ(-prim_phi);
     primary_tmp.RotateY(-prim_theta);
@@ -228,6 +242,7 @@ Bool_t PAngularDistribution::SampleAngle(void) {
     double polar_angle=acos(SamplePolarAngle(0.5*(cos(prim_theta)+1)));   
     //2r=cos_theta-1 was the definition in the baryon_cos alg of the original PChannel
     //polar_angle=prim_theta;
+    //cout << polar_angle << endl;
 
     if ((polar_angle < -2.*TMath::Pi()) || (polar_angle > 2.*TMath::Pi())) {
 	Warning("SampleAngle","Wrong polar angle");

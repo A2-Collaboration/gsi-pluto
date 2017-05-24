@@ -99,6 +99,7 @@ PChannel:: PChannel(PParticle **particles, int nt, int mf, int af, int bf) {
     IsReaction();     // if reaction channel, identify beam, target & decay mode
 
     particles[0]->SetDecayModeIndex(makeStaticData()->GetDecayIdxByKey(decay_key));
+    // cout << "Parent didx set to " << makeStaticData()->GetDecayIdxByKey(decay_key) << endl;
     w=particles[0]->W();           // weight on instantiation
     ecm=particles[0]->M();         // system invariant mass on instantiation
     DMIndex=makeStaticData()->GetDecayIdx(ipid.GetArray(),n); // match decay mode with PData
@@ -165,6 +166,7 @@ PChannel:: PChannel(int idx, PParticle ** particles, int mf, int af, int bf) {
     IsReaction();                  // if reaction channel identify beam, target & decay mode
 
     ptcls[0]->SetDecayModeIndex(makeStaticData()->GetDecayIdxByKey(decay_key));
+    // cout << "Parent didx set to " << makeStaticData()->GetDecayIdxByKey(decay_key) << endl;
     w=ptcls[0]->W();               // weight on instantiation
     ecm=ptcls[0]->M();             // system invariant mass on instantiation
 }     
@@ -211,6 +213,7 @@ PChannel:: PChannel(int idx, PParticle & parent, int mf, int af, int bf) {
     IsReaction();                    // if reaction channel identify beam, target & decay mode
 
     ptcls[0]->SetDecayModeIndex(makeStaticData()->GetDecayIdxByKey(decay_key));
+    // cout << "Parent didx set to " << makeStaticData()->GetDecayIdxByKey(decay_key) << endl;
     w=ptcls[0]->W();                 // weight on instantiation
     ecm=ptcls[0]->M();               // system invariant mass on instantiation
 }     
@@ -282,6 +285,7 @@ void PChannel:: IsReaction() {
     bid=ipid[0]%1000;                    // beam id
 
     IdChannel();                             // identify reaction if known
+    //cout << "parent: " << ipid[0] << endl;
     //get data base key
     decay_key = makeStaticData()->GetDecayKey(ipid.GetArray(), n);
     if ((decay_key < 0) && (ipid[0]>999)) {
@@ -293,6 +297,7 @@ void PChannel:: IsReaction() {
     for (int i=1;i<=n;++i) { 
 	emin += PData::LMass(ptcls[i]->ID());
     }
+    //cout << "emin set to: " << emin << endl;
     //BUGBUG: check for an additional Decayemin
 
 }
@@ -458,6 +463,7 @@ void PChannel:: ThermalSampling() {
 	else phi = *event_plane;
 	if (nTherm > n) nTherm = n;
     }
+    //    cout << "got " << nTherm << " thermal products" << endl;
     *event_impact_param = b;
     *event_plane        = phi;
     for(i=1;i<=nTherm;i++) {
@@ -485,9 +491,11 @@ void PChannel:: ThermalSampling() {
 	else ptcls[i]->SetSourceId(pFire->ID());
 	
 	ptcls[i]->SetParentId(pFire->ID());
-    ptcls[i]->SetActive();
+	ptcls[i]->SetActive();
+	// cout << "active " << i << endl;
     }
     for(i=nTherm+1;i<=n;i++) {
+	// cout << "inactive " << i << endl;
 	ptcls[i]->SetInActive();  // inactivate rest
     }
 
@@ -578,6 +586,9 @@ int PChannel:: CheckSiblings(PParticle * p, PDistribution * dist, int flag) {
 	if ((p->GetParent()->ID() > 500) && (p->GetParent()->ID() <1000)) return -1;
 
     if (p->ID() >= 1000) return -1; //no sibling for compounds
+
+   //  cout << "******************checkSiblings for " <<dist->GetName() <<   ", SEED: " << endl;
+//      p->Print();
     
     PParticle * currentSibling = p->GetSibling();   
     Int_t counter=0; //break condition
@@ -585,11 +596,15 @@ int PChannel:: CheckSiblings(PParticle * p, PDistribution * dist, int flag) {
     while (currentSibling != p) {
 	if (currentSibling == NULL) return ret;
 	if (ret == 0) { //found one more "additional" sibling -> reset 
-        ret = -1;
-    }
+	    ret = -1;
+	    //cout << "RESET" << endl;
+	}
+  	//cout << "My sibling is:" << endl;
+ 	//currentSibling->Print();
 
 	if (dist->SetParticle(currentSibling, currentSibling->ID(), flag | PARTICLE_LIST_SIBLING) == 0) { //I found the missing sibling
-        ret = 0;
+	    ret = 0;
+	    //cout << "found the missing sibling" << endl;
 	}  
 	//jump to next sibling
 	currentSibling = currentSibling->GetSibling();
@@ -600,6 +615,8 @@ int PChannel:: CheckSiblings(PParticle * p, PDistribution * dist, int flag) {
 	    return -1;
 	}
     }
+//     cout << "RET: " << ret << endl;
+//     dist->Print();
     if (ret == -1) dist->ResetRelatives(flag | PARTICLE_LIST_SIBLING); //RESET current flag
     return ret;
 }
@@ -669,6 +686,8 @@ Bool_t PChannel::Init() {
     if (set_mode_index < 2)  //
 	ptcls[0]->SetDecayModeIndex(makeStaticData()->GetDecayIdxByKey(decay_key));
     else {
+// 	cout << "partial sampling disabled" << endl;
+// 	Print();
 	ptcls[0]->SetDecayModeIndex(-1);
     }
 
@@ -876,6 +895,8 @@ int PChannel::Decay() {
 
     TVector3 vCreation, vDecay;
     Double_t tCreation, tDecay;
+
+    //if (*events >= 233880) cout << "enter " << decay_key << endl;
     
 
     if (!init_done) Init();
@@ -949,17 +970,23 @@ int PChannel::Decay() {
     } //Prepare can change the parent mass
 
     if (ecm<emin) {
+	// cout << "ecm: " << ecm << " emin: " << emin <<  endl;
+ 	// parent->Print();
+ 	// Print();
 	return status=4; // not enough energy to do the channel
     }
     
     Int_t do_flag=1, distr_status = 0;
     while (do_flag) {  // do genbod loop until all distributions are convinced
-    status=Genbod(nProd);  // induce first isotropic decay
+	//if (*events >= 233880) cout << "genbod" << endl;
+	status=Genbod(nProd);  // induce first isotropic decay
+	//if (*events >= 233880) cout << "genbod done, status=" << status << endl;
 	distr_status = 0;
 
 	for (int j=0;j<distribution_position;j++) { //loop over all valid distributions
 	    if ((dist[j]->GetStatus() == 0) && dist[j]->GetEnable()) { //all particles set
-        if (dist[j]->IsValid() == kFALSE) {
+		if (dist[j]->IsValid() == kFALSE) { 
+		    //cout << dist[j]->GetIdentifier() << endl;
 		    distr_status++;
 		    if (dist[j]->CheckAbort()) {
 			do_flag = 1000000;//set to big number, next step will abort
@@ -1027,14 +1054,17 @@ int PChannel::Decay() {
 		    ((dist[j]->GetVersionFlag()) & VERSION_WEIGHTING)) {
 		    
 		    Double_t local_weight = dist_weight[j];
-            //weighting is enabled
+		    //weighting is enabled
+		   //  dist[j]->Print();
+// 		    cout << "...has " << local_weight << endl;
 		
 		    if ((dist[j]->GetVersionFlag()) & VERSION_GENERATOR_MC) { 
 			//Pure function models
 			//--> These are function for which we have
 			//Int dx dsigma/dx = sigma
 			//In this case, the boundaries have to be taken into account
-            //This is the Delta_x in the MC integral
+			//This is the Delta_x in the MC integral
+			//cout << "We got: " << local_weight << " with: " << dynamic_range << endl;
 			local_weight*=dynamic_range;
 			dynamic_range=1.;
 		    }	
@@ -1046,17 +1076,22 @@ int PChannel::Decay() {
 			} else {
 			    //Weighting model
 			    dist[j]->IncrementWeightSum(local_weight,1./generator_weight);
-            }
+			}
+			//cout << dist[j]->GetExpectedWeightMean() << ":" << dist[j]->CalcWeightMean() << endl;
 			local_weight*=(dist[j]->GetExpectedWeightMean()/dist[j]->CalcWeightMean());
 		    } 
 
-            new_weight*=local_weight;  //fold with local weights
+		    // cout << "1:" <<  local_weight << endl; 		   		    
+		    new_weight*=local_weight;  //fold with local weights
+		    //		    cout << "2:" <<  new_weight << endl; 
 		    
 		    dist_weight_sum[j]+=local_weight;
 		    dist_counter[j]++;
 		} else { //for sampling models use just the mean
 		    if (dist[j]->GetExpectedWeightMean() > 0) {
-            new_weight*=dist[j]->GetExpectedWeightMean();
+			new_weight*=dist[j]->GetExpectedWeightMean();
+			// 		    cout << new_weight << endl;
+			// 		    dist[j]->Print();
 			dist_weight_sum[j]+=dist[j]->GetExpectedWeightMean();
 			dist_counter[j]++;
 			
@@ -1086,7 +1121,9 @@ int PChannel::Decay() {
 
 	if (new_weight<=0.) return status=2; // something wrong
 
-    weight_sum+=new_weight;
+	weight_sum+=new_weight;
+	//ptcls[0]->Print();
+	//cout << "new_weight:" << new_weight << endl;
 	
 #endif
 
@@ -1138,8 +1175,10 @@ int PChannel::Genbod(int nProd) {
 
     //MASS SAMPLING
     for (int j=0;j<distribution_position;j++) { //loop over all valid distributions
-    if ((dist[j]->GetStatus() == 0) && dist[j]->GetEnable()){ //all particles set
-        if ((dist[j]->GetVersionFlag()) & VERSION_SAMPLING)
+	if ((dist[j]->GetStatus() == 0) && dist[j]->GetEnable()){ //all particles set
+	    //	    cout << dist[j]->GetVersionFlag() << ":" <<dist[j]->GetIdentifier() <<endl;
+	    if ((dist[j]->GetVersionFlag()) & VERSION_SAMPLING)
+		//		cout << dist[j]->GetIdentifier() << endl;
 		if (dist[j]->SampleMass()) {
 		    PDistribution_sampleMass = kTRUE;
 		    for (i=0;i<nProd;++i) {
@@ -1160,9 +1199,15 @@ int PChannel::Genbod(int nProd) {
     }
   
     if ((conserve_e <  -1.e-8) && (nProd>1) ) {
+      // cout << "***********" << endl;
+      // for (i=0;i<=nProd;++i) ptcls[i]->Print();
+      // cout << conserve_e << endl;
 	return status=5;
     }
     conserve_e=ptcls[0]->M();
+
+//     cout << ecm << endl;
+//     ptcls[0]->Print();
 
     Int_t last_sampling_model = 0;
 
@@ -1206,6 +1251,10 @@ int PChannel::Genbod(int nProd) {
     for (i=0;i<nProd;++i) conserve_e-=ptcls[i+1]->E();
 
     if (fabs(conserve_e)>1.e-8) {
+ 	 // cout << "*************conserve_e" << conserve_e  << endl;
+ 	 // ptcls[0]->Print();
+ 	 // for (i=0;i<nProd;++i) ptcls[i+1]->Print();
+ 	 // cout << "*************" << endl;
 	return status=7; // conservation of energy violated
     }
 
@@ -1270,6 +1319,7 @@ int PChannel::SetDistribution(PDistribution * distribution) {
     distribution = (PDistribution*) distribution->Clone();
     
     if (distribution->GetStatus() == 0) { //we are complete
+	//cout << distribution->GetName() << " attached at" <<  distribution_position   << endl;
 	if (distribution->Init() == kFALSE) {
 	    printf("                             [error] %s:%s\n",distribution->GetDescription(),distribution->GetIdentifier());
 	    distribution->SetEnable(0);

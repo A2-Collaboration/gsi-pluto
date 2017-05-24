@@ -28,6 +28,8 @@ PChannelModel::PChannelModel(const Char_t *id, const Char_t *de, Int_t key) :
     model_def_key = is_pid = is_channel = -1;
     sec_key=-1;
 
+    //cout << id << endl;
+
     makeStaticData();
     SetVersionFlag(VERSION_IS_PRIMARY);
     if (key<0) {
@@ -53,7 +55,8 @@ PChannelModel::PChannelModel(const Char_t *id, const Char_t *de, Int_t key) :
 	}
 
 	char * db_id = new char[strlen(id)+1-alt_position];
-    strcpy(db_id,&(id[alt_position]));
+	strcpy(db_id,&(id[alt_position]));
+	//	cout << "db_id " << db_id << endl;
 	for (Int_t i=strlen(id);i>=alt_position;i--) {
 	    if (id[i]==path_delim) path_position=i;
 	}
@@ -61,7 +64,8 @@ PChannelModel::PChannelModel(const Char_t *id, const Char_t *de, Int_t key) :
 	if (path_position) { 
 	    path_position++; //skip "/"
 	    model_def_key = makeStaticData()->
-        MakeDirectoryEntry("modeldef",NMODEL_NAME,LMODEL_NAME,&(id[path_position]));
+		MakeDirectoryEntry("modeldef",NMODEL_NAME,LMODEL_NAME,&(id[path_position]));
+	    //cout << &(id[path_position-1]) << endl;
 	    char * nid = new char[strlen(id)+1];
 	    strcpy(nid,id);
 	    nid[path_position-1]='\0';
@@ -75,7 +79,8 @@ PChannelModel::PChannelModel(const Char_t *id, const Char_t *de, Int_t key) :
 	    strcpy(nid,id);
 	    nid[path_position-1]=path_delim;
 	    id=nid;
-    }
+	}
+	//cout << arr1_s << ":" << arr1[0] << endl;
 	if ((arr1_s <= 2)) { //Particle
 	    //key=makeDataBase()->GetEntry(arr1[0]);
 	    key=makeStaticData()->GetParticleKey(arr1[0]);
@@ -92,7 +97,8 @@ PChannelModel::PChannelModel(const Char_t *id, const Char_t *de, Int_t key) :
 		    sec_key = key;
 		    makeDataBase()->SetParamInt (key, "defkey", &model_def_key);
 		}
-        ClearVersionFlag(VERSION_IS_PRIMARY);
+		ClearVersionFlag(VERSION_IS_PRIMARY);
+		//cout << key << endl;
  	    }
 	} else if (arr1_s > 2) { //Decay
 
@@ -105,7 +111,9 @@ PChannelModel::PChannelModel(const Char_t *id, const Char_t *de, Int_t key) :
 
 	    key = makeStaticData()->GetDecayKey(arr1_id,arr1_s-2);
 	    if (key<0) key = makeStaticData()->AddDecay(arr1_id,arr1_s-2);
-        is_channel = makeStaticData()->GetDecayIdxByKey(key);
+	    is_channel = makeStaticData()->GetDecayIdxByKey(key);
+
+	    //cout << "parse decay got " << key << endl;
 
  	    if (path_position) {
 		//before we continue here, we have to check if alias
@@ -122,7 +130,9 @@ PChannelModel::PChannelModel(const Char_t *id, const Char_t *de, Int_t key) :
 		    sec_key = key;
 		}
 		ClearVersionFlag(VERSION_IS_PRIMARY);
-        }
+ 	    }
+
+	    //cout << "after sec " << key << endl;
 
 	    //To make life more easy, add "default" track template
  	    Add(arr1[0],"parent");
@@ -137,10 +147,12 @@ PChannelModel::PChannelModel(const Char_t *id, const Char_t *de, Int_t key) :
 	    //reset ID:
 	    char * newid = new char[alt_position];
 	    strncpy(newid,id,alt_position);
-        newid[alt_position-1]='\0';
+	    newid[alt_position-1]='\0';
+	    //cout << id << ":" << newid << endl;
 	    identifier=newid;
 	    
-    }
+	}
+//	cout << id <<" key: " << key << endl;
 
     }
 
@@ -265,7 +277,9 @@ Double_t PChannelModel::Eval(Double_t x, Double_t y , Double_t z , Double_t t ) 
     my_didx_option[0]=didx_option;
 
     if (draw_option==0) {
-    return ((PChannelModel*)this)->GetWeight(my_x,my_didx_option);
+	//cout << my_didx_option[0] << endl;
+	return ((PChannelModel*)this)->GetWeight(my_x,my_didx_option);
+	//return res;
     }
     if (draw_option==1) {
 	((PChannelModel*)this)->GetWidth(x,&res,didx_option);
@@ -366,6 +380,7 @@ Bool_t PChannelModel::GetBR(Double_t mass, Double_t *br, Double_t totalwidth) {
     //Make everything coherent to Dyn.Data
     Double_t sc=1.;
     Double_t *scfactor=&sc;
+//    cout << didx_param <<","<< is_channel <<","<< scfactor_param<<endl;
     makeDataBase()->GetParamDouble (didx_param, is_channel , scfactor_param, &scfactor);
 
     lwidth*=*scfactor;
@@ -377,7 +392,8 @@ Bool_t PChannelModel::GetBR(Double_t mass, Double_t *br, Double_t totalwidth) {
     if (totalwidth <= (*unstable_width)) 
 	*br = makeStaticData()->GetDecayBR(is_channel);
     else  {
-    //if we have a local width, the BR is the partial width divided by total
+	//if we have a local width, the BR is the partial width divided by total
+//	cout << lwidth << ":" << totalwidth << endl;
 	*br = lwidth/totalwidth;
     }
     return kTRUE; 

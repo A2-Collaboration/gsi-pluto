@@ -193,6 +193,8 @@ Bool_t PAnyDistribution::IsValid(void) {
     } else {
 	Fatal("IsValid","No equation set");
     }
+    
+    //cout << "Factor: " << factor <<  endl;
 
 
     Double_t myres=0.;

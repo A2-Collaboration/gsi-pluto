@@ -210,6 +210,7 @@ PBatch::PBatch() {
 Int_t PBatch::Execute(Int_t command_pos, Int_t retval) {
 
     //retval = kFALSE; //standard, can be overwritten for a foreach
+    //cout << "command:" << command_pos << ":" << command_pointer << ":" << retval << endl;
 
     current_position = -1;
 
@@ -223,6 +224,8 @@ Int_t PBatch::Execute(Int_t command_pos, Int_t retval) {
 	Double_t *val4=NULL;
 	
 	current_position = i;
+
+	//cout << "command:" << lst_command[i] << " num "<< i <<  endl;
 
 	if (lst_command[i] == COMMAND_PLUS) {
 	    //
@@ -517,13 +520,16 @@ Int_t PBatch::Execute(Int_t command_pos, Int_t retval) {
 
 	    //First, we have to set the variables
 	    methods[lst_command_int[i]]->ResetParam();
-        for (int j=0;j<4;j++) {
-        if (methods_arg_flags[j][lst_command_int[i]] == METHOD_RETURN_DOUBLE) {
+	    for (int j=0;j<4;j++) {
+		//cout << lst_command_int[i] << ":" << j << endl;
+		if (methods_arg_flags[j][lst_command_int[i]] == METHOD_RETURN_DOUBLE) {
+		    //cout << lst_key[j+2][i] << ":" << batch_value_param << endl;
 		    if (makeDataBase()->GetParamDouble (lst_key[j+2][i],batch_value_param, &argval)) { //j=1 is object
 			if (!argval) {
 			    Warning("Execute","Double argument for key %i is NULL",lst_key[j+2][i]);
 			    return retval;
-            }
+			}
+			//cout << argval << endl;
 			methods[lst_command_int[i]]->SetParam(*argval);
 		    } else {
 			Warning("Execute","Double argument for key %i not found",lst_key[j+2][i]);
@@ -547,13 +553,15 @@ Int_t PBatch::Execute(Int_t command_pos, Int_t retval) {
 	    if (methods_flags[lst_command_int[i]] == METHOD_RETURN_DOUBLE) {
 		makeDataBase()->GetParamDouble (lst_key_a[i],batch_value_param, &val);
 		if (!val) return retval;
-        methods[lst_command_int[i]]->Execute(a1,*val);
+		methods[lst_command_int[i]]->Execute(a1,*val);
+		//cout << "Double_t meth " << method_name[lst_command_int[i]] << " called, result " << *val << endl;
 	    }
 	    else if (methods_flags[lst_command_int[i]] == METHOD_RETURN_INT ) { //INT
 		Long_t ret;
 		makeDataBase()->GetParamDouble (lst_key_a[i],batch_value_param, &val);
 		if (!val) return retval;
-        methods[lst_command_int[i]]->Execute(a1,ret);
+		methods[lst_command_int[i]]->Execute(a1,ret);
+		//cout << "Int_t meth " << method_name[i] << " called, result " << ret << endl;
 		(*val)=(Double_t) ret;
 	    } else if (methods_flags[lst_command_int[i]] == METHOD_RETURN_PPARTICLE ) { 
 		//PParticle* ret2;//, *ret;
@@ -564,7 +572,8 @@ Int_t PBatch::Execute(Int_t command_pos, Int_t retval) {
 		Fatal("Execute","Return type PParticle* not yet working");
 		//if (ret) *ret2 = * ret;
 	    } else { //VOID
-        methods[lst_command_int[i]]->Execute(a1);
+		methods[lst_command_int[i]]->Execute(a1);
+		//cout << "void meth " << method_name[lst_command_int[i]] << " called" << endl;
 		makeDataBase()->GetParamDouble (lst_key_a[i],batch_value_param, &val);
 		if (val) (*val)=0;
 	    }
@@ -814,6 +823,7 @@ Int_t PBatch::Execute(Int_t command_pos, Int_t retval) {
 
  	    if (!val) return retval;
 
+	    //	    cout << *val << endl;
  	    *val= myres;
 	    if (fabs(*val) == 0) return retval;
 
@@ -936,7 +946,8 @@ Int_t PBatch::Execute(Int_t command_pos, Int_t retval) {
 	    // Build-in loops for PProjector
 	    //
 	    Int_t  stream_max;
-        if (!makeDataBase()->GetParamInt(lst_key[1][i],stream_max_pos_param, &stream_max)) {
+	    if (!makeDataBase()->GetParamInt(lst_key[1][i],stream_max_pos_param, &stream_max)) {
+		//cout << "particle not in stream" << endl;
 		return kFALSE; //particle not in stream, abort
 	    }
 
@@ -968,7 +979,8 @@ Int_t PBatch::Execute(Int_t command_pos, Int_t retval) {
 
 	} else if (lst_command[i] == COMMAND_READLINE) {
 
-        if (readline_format_string[i]) {
+	    if (readline_format_string[i]) {
+		//cout << file << ":" << readline_format_string[i] << ":" << endl;
 		if (!file) {
 		    Error("Execute","readline called, but no file open");
 		    return kFALSE;
@@ -987,12 +999,16 @@ Int_t PBatch::Execute(Int_t command_pos, Int_t retval) {
 		    cout << "< " << readline_string[i] << endl;
 		    cout << "> " << line;
 		}
-        for (int j=0;j<readline_num_args[i];j++) {
+		for (int j=0;j<readline_num_args[i];j++) {
+		    //cout << my_readline_args[j] << " --> " << (*(readline_args[i])+j) << endl;
 		    *(*(readline_args[i]+j)) = my_readline_args[j];
 		}
 	    }
 
-    } else if (lst_command[i] == COMMAND_ECHO) {
+	} else if (lst_command[i] == COMMAND_ECHO) {
+	    //
+	    // echo blabla
+	    //
 	    char puffer[1000]; //I hope there will be never a string longer...
 	    char format_puffer[1000]; //I hope there will be never a string longer...
 	    unsigned int puffer_pointer=0,format_puffer_pointer=0;
@@ -1010,7 +1026,8 @@ Int_t PBatch::Execute(Int_t command_pos, Int_t retval) {
 			(current!='#') && (current!='_') && (!isalnum(current))) {
 			//end
 			seek_mode = 0;
-            puffer[puffer_pointer]='\0';
+			puffer[puffer_pointer]='\0';
+			//cout << ":"<< puffer << ":" << endl;
 			Double_t *x=makeStaticData()->GetBatchValue(puffer,0);
 			if (file) {
 			    if (x) {
@@ -1064,7 +1081,8 @@ Int_t PBatch::Execute(Int_t command_pos, Int_t retval) {
 			seek_mode = 2;
 		    }
 		    else if (seek_mode == 1) {
-            puffer[puffer_pointer]=current;
+			puffer[puffer_pointer]=current;
+			//cout << (int) puffer[puffer_pointer] << endl;
 			if (puffer_pointer < 1000) puffer_pointer++;
 			else {
 			    if (!file)
@@ -1117,6 +1135,7 @@ Bool_t PBatch::AddCommand(char * command) {
     }
     if (!has_something) return kTRUE;
 
+    //cout << "AddCommand:" << command << endl;
     //First check if we have a composite command
 
     int is_composite=0;
@@ -1146,7 +1165,8 @@ Bool_t PBatch::AddCommand(char * command) {
 	if (strlen(command) > 4) {
 	    char * dummy = new char[strlen(command)-2];
 	    strncpy(dummy,command+4,strlen(command)-4);
-        dummy[strlen(command)-4]='\0';
+	    dummy[strlen(command)-4]='\0';
+	    //cout << "echo:" << dummy << endl;
 	    if (tmp_file) file = tmp_file;
 	    PUtils::remove_spaces(&dummy);
 	    echo_string[command_pointer]=dummy;
@@ -1164,7 +1184,8 @@ Bool_t PBatch::AddCommand(char * command) {
 	    PUtils::remove_brackets(&dummy,'{','}');
 	    for (unsigned int i=0;i<strlen(dummy);i++) {
 		if (dummy[i] == '\"') dummy[i] = ';';
-        }
+	    }
+	    //cout << "readline:" << dummy << endl;
 	    if (tmp_file) file = tmp_file;
 	    char puffer[1000]; //I hope there will be never a string longer...
 	    unsigned int puffer_pointer = 0, dummy2_pointer = 0, args_pointer=0;
@@ -1190,7 +1211,8 @@ Bool_t PBatch::AddCommand(char * command) {
 			//end
 			seek_mode =0;
 			puffer[puffer_pointer]='\0';
-            Info("Readline","Write to batch variable '%s'",puffer);
+			Info("Readline","Write to batch variable '%s'",puffer);
+			//cout << ":"<< puffer << ":" << endl;
 			char * dummy3 = new char[strlen(puffer)+1];
 			strcpy(dummy3,puffer);
 			
@@ -1285,6 +1307,8 @@ Bool_t PBatch::AddCommand(char * command) {
 		&& command[i-1]!='=' && command[i+1]!='=') is_operator++;
 	}
     }
+
+    //cout << is_operator << endl;
 
     //let us copy the command first, because it might be modified
     //after the pointer is given to the data base
@@ -1542,7 +1566,8 @@ Bool_t PBatch::AddCommand(char * command) {
 	   
 	    //check if the next char after () is a ';':
 	    int bracket_pos = -1, bracket_pos2 = -1, bracket_num=0, found_trailer=0;
-        for (unsigned int i=2;i<strlen(command);i++) {
+	    for (unsigned int i=2;i<strlen(command);i++) {
+		//cout << command[i] << ":" << bracket_num  << ":" << bracket_pos<< endl;
 		if (command[i] != '(' && command[i] != ' ' && !bracket_num) i=strlen(command); //exit
 		if (command[i] == '(' && bracket_pos == -1) {
 		    bracket_pos=i;
@@ -1555,6 +1580,7 @@ Bool_t PBatch::AddCommand(char * command) {
 		else if (command[i] == ')') bracket_num--;
 	    }
 
+	    //cout << command << endl;
 	    if (bracket_pos != -1 && bracket_pos2 != -1 && found_trailer) {
 		command[bracket_pos2] = ';';
 		command[bracket_pos] = ' ';
@@ -1749,10 +1775,12 @@ Bool_t PBatch::AddCommand(char * command) {
 		    dot_version=0; //must be something different
 		prev_dot_version = dot_version;
 	    }
-    }
+	}
+	//cout << "dot version is:" << dot_version << endl;
 	brack_counter=0;
 	if (dot_version>0) {
-        for (int i = method_position-1;i>=0;i--) {
+	    for (int i = method_position-1;i>=0;i--) {
+		//cout << i << ":" << command[i] << ":" << dot_version << endl;
 		if (command[i]=='(' || command[i]=='[' || command[i]=='{') 
 		    brack_counter--;
 		if (command[i]==')' || command[i]==']' || command[i]=='}') 
@@ -1760,7 +1788,8 @@ Bool_t PBatch::AddCommand(char * command) {
 		if (brack_counter==0 && ((command[i]==' ') || (command[i]=='+') || (command[i]=='-')))
 		    dot_version=0; //cases like "a + b.x"
 	    }
-    }
+	}
+	//cout << "dot version is now:" << dot_version << endl;
 	if ((dot_version>0) && (!found)) {
 	    //catch the cases where comparators are used
 	    for (unsigned int i=0;i< (unsigned int)method_position;i++) {
@@ -1769,7 +1798,8 @@ Bool_t PBatch::AddCommand(char * command) {
 	    }
 	}
 
-    if ((dot_version>0) && (!found)) {
+	if ((dot_version>0) && (!found)) {
+	    //cout << command << endl;
 	    char *prodx[2];
 	    prodx[0] = new char[method_position+1];
 	    strncpy(prodx[0], command, method_position);
@@ -1945,7 +1975,8 @@ Bool_t PBatch::AddCommand(char * command) {
 		    key1 = makeDataBase()->GetEntry(prodx[0]);
 		    if (key1 >=0) {
 			Int_t handle = GetMethodHandle(prodx[1],2);
-            if (handle>=0) {
+			if (handle>=0) {	
+			    //cout << "key1:" << key1 << " arg1:" << arg1 << " handle:" << handle << endl;
 			    if (AddCommand(COMMAND_INTERNAL,key_a,key1,arg1,arg2,arg3,arg4))  {
 				found=kTRUE;
 				lst_command_int[command_pointer-1]=handle;
@@ -2079,7 +2110,8 @@ Bool_t PBatch::AddCommand(char * command) {
 	if (found) return kTRUE;
 	//....or the wrapper to PUtils
 	Int_t handle = GetMethodHandle(command, 1);
-    if (handle>=0) {
+	if (handle>=0) {		
+	    //cout << "found PUtils with " << command3<< endl;
 	    key1 = makeStaticData()->
 		MakeDirectoryEntry("batch_objects",NBATCH_NAME,LBATCH_NAME,command3);
 	    Double_t * delme =  new Double_t(0.);
@@ -2109,7 +2141,9 @@ Bool_t PBatch::AddCommand(char * command) {
 	for (int pos=0;pos<num_args;pos++) {
 	    //loop over 2 args
 	    Int_t key=key1;
-        if (pos==1) key=key2;
+	    if (pos==1) key=key2;
+	    
+	    //Int_t *ii;
 
 	    if (key>-1) {
 		Double_t * delme;
@@ -2137,7 +2171,9 @@ Bool_t PBatch::AddCommand(char * command) {
 		}
 	    }
  	    
-    }
+	}
+
+	//cout << is_value_result_type << " .... "<< is_obj_result_type << endl;
 
 	if (is_obj_result_type) {
 	    TObject * delme;
@@ -2205,6 +2241,7 @@ Int_t PBatch::EvalPFormula(char * command) {
     //PFormula command, and put the arguments on the stack
     //if this did not worked out, the stack is resetted
     AddSpacePlaceholder(command);
+    //cout << "PFormula called:" << command << endl;
     PFormula * tmp = new PFormula(command,command);    
     Int_t worked_out=1, num_params=0;
 
@@ -2221,6 +2258,7 @@ Int_t PBatch::EvalPFormula(char * command) {
 	char * internal_command = new char[strlen(tmp->error_string.Data())+1];
 	strcpy(internal_command,tmp->error_string.Data());
 
+	//cout << "Internal command error: "<< internal_command << endl;
 	//BUGBUG
 	//if the error string is *exactly* the input command, something is wrong....
 	if (strcmp(internal_command,command)==0) {
@@ -2230,12 +2268,14 @@ Int_t PBatch::EvalPFormula(char * command) {
 	}
 
 	//	mod_command = ...aus PFormula, after replacing	
-    TString *op = new TString(tmp->chaine);
+	TString *op = new TString(tmp->chaine);
+	//cout << "Chaine from TFormula: "<< op->Data() << endl;
 	char opt[5];
 	sprintf(opt,"[%i]",num_params);
 	//op->ReplaceAll(tmp->error_string,opt);
 	ReplaceAll(op,tmp->error_string,opt);
-    mod_command = op->Data();
+	mod_command = op->Data();
+	//cout << "Modified command: "<< mod_command  << endl;
 
 	delete(tmp);
 	RemoveSpacePlaceholder(internal_command);
@@ -2307,8 +2347,10 @@ void  PBatch::ReplaceAll(TString *op,const char * oldstring,const char * newstri
 		// 		     (nextchar != '_')) || 
 		// 		    ((nextchar == '-') && (mystring[i+strlen(oldstring)+1] != '>'))
 		// 		    ) {
-        if (!varname) {
-            op->Replace(i,strlen(oldstring),newstring,strlen(newstring));
+		if (!varname) {
+		    //cout << "match: " << mystring << ":" << oldstring <<  ":" << newstring << endl;
+		    op->Replace(i,strlen(oldstring),newstring,strlen(newstring));
+		    //cout << "now: " << op->Data() << endl;
 		    i=strlen(mystring)+1;
 		    doloop = kTRUE;  //yet another try
 		}
@@ -2322,6 +2364,7 @@ Int_t PBatch::GetMethodHandle(char * name, Int_t flag) {
     //returns a -1 if not found or invalid
 
     //BUGBUG: have to include overloading
+    //cout << "name:" <<  name << endl;
 
     TList *list;
     if (flag==0)
@@ -2344,10 +2387,13 @@ Int_t PBatch::GetMethodHandle(char * name, Int_t flag) {
 
 	    UInt_t realname_len = 0;
 	    for (;realname_len<strlen(name);realname_len++) if (name[realname_len]=='(') break;
+
+	    //cout << meth->GetName() << endl;
 	    
 	    if ((strncmp(meth->GetName(),name,realname_len) == 0) && 
 		(strlen(meth->GetName()) == realname_len)) {
-        //found name
+		//found name
+		//cout << meth->GetReturnTypeName() << endl;
 		if ((strcmp(meth->GetReturnTypeName(),"Double_t") ==0 ) || 
 		    (strcmp(meth->GetReturnTypeName(),"Int_t") ==0 ) || 
 		    (strcmp(meth->GetReturnTypeName(),"PParticle*") ==0 ) || 
@@ -2387,7 +2433,8 @@ Int_t PBatch::GetMethodHandle(char * name, Int_t flag) {
 			
 			int j=0;
 			while ((arg_meth=(TMethodArg *) arg_iter->Next())) {
-                //set up the argument list
+			    //set up the argument list
+			    //cout << arg_meth->GetTypeName() << endl;
 			    if (j==4 && error == 2) {
 				Error("GetMethodHandle","More then 4 arguments, not yet supported");
 				return -1;
@@ -2415,7 +2462,9 @@ Int_t PBatch::GetMethodHandle(char * name, Int_t flag) {
 						
 		    }
 
-            methods[method_pointer] = new TMethodCall();
+		    methods[method_pointer] = new TMethodCall();
+		    
+		    //cout << numargs << ":" << meth->GetNargs() << endl;
 
 		    if (numargs == meth->GetNargs()) {
 			
@@ -2443,7 +2492,8 @@ Int_t PBatch::GetMethodHandle(char * name, Int_t flag) {
 			new_name = new char[strlen(meth->GetName())+1];
 			strcpy(new_name,meth->GetName());
 			method_name[method_pointer]= new_name;
-            method_pointer++;
+			method_pointer++;
+			//cout << "******* " << method_pointer-1 << endl;
 			return method_pointer-1;
 		    } else { 
 			error = 3;
@@ -2476,6 +2526,7 @@ Int_t  PBatch::CrackMethodArgs(char * name) {
     //Input: the arg string including the trailing ")"
     arg1=arg2=arg3=arg4=-1;
 
+    //cout << "CrackMethodArgs:" << name << endl;
     //nested objects should not be cracked!
     //workaround: replace , by "
 
@@ -2671,6 +2722,8 @@ Int_t PBatch::GetKey(char * name, int fl, int makeflag) {
     //              e.g. obj->...
     //              make AddCommand
     //fl=2        : Take SetVarList into account
+
+    //cout << "getKey" << name << ":" << makeflag <<  endl;
   
     //do we contain ()?
     //int br = 0;
@@ -2732,7 +2785,8 @@ Int_t PBatch::GetKey(char * name, int fl, int makeflag) {
 	    
 	    Int_t number=-999;
 	    
-        if (arg2) { //try to get number
+	    if (arg2) { //try to get number
+		//cout << "arg: " << arg2 << endl;
 		Int_t * delme = new Int_t (number);
 		Int_t numkey = -999;
 		//First, let's check for a variable
@@ -2755,14 +2809,16 @@ Int_t PBatch::GetKey(char * name, int fl, int makeflag) {
 		    } 
 		    *delme = -1000 - numkey; //-999 means not found!
 		} else if (PUtils::IsInt(arg2)) {
-            sscanf(arg2,"%i",&number);
+		    sscanf(arg2,"%i",&number);
+		    //cout << "found number: " << number << endl;
 		    *delme = number;
 		    if (strcmp(arg2,"+")==0) { 
 			*delme = -111;
 			status=1;
 		    }
 		} else Error("AddCommand","[%s] Unknown value '%s'",name,arg2);
-        //mis-use link:
+		//mis-use link:
+		//cout << "delme: " << *delme << endl;
 		makeDataBase()->SetParamInt (key ,"link", delme);
 	    }
 	    makeflag = 0;
@@ -2771,7 +2827,8 @@ Int_t PBatch::GetKey(char * name, int fl, int makeflag) {
 
     if (makeflag==-1 && PUtils::ValidVariableName(name)) {
 	//cancel AddCommand
-    makeflag=0;
+	makeflag=0;
+	//cout << name << " cancelled" << endl;
     }
 
     if (makeflag==2 && !PUtils::ValidVariableName(name)) {

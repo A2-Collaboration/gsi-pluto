@@ -105,6 +105,7 @@ Double_t PBreitWigner::GetWeight(Double_t *mass, Int_t *didx) {
 //    wmt = mtIntegral(mcut,tempMtScaling)/mtIntegral(Mass(id),tempMtScaling);
 //  } 
 //  return wmt*m2*g2/(mm*mm+m2*g2);  // ->  BW(Mres) = 1
+//    cout << "result: " << global_weight_scaling*wmt*m2*partial_width/(mm*mm+m2*g2) << endl;
 
     Double_t w= global_weight_scaling*wmt*m2*partial_width/(mm*mm+m2*g2);
 
