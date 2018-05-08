@@ -2,7 +2,7 @@ Installation:
 _____________________________________________________
 
 Standard installation:
-./cmake
+cmake .
 make
 
 
