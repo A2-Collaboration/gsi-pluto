@@ -1,0 +1,9 @@
+Plugin for:
+
+1.) Update the Pluto data base with the PDG particle code
+
+2.) Add an UniGen input source
+
+The input source and the array for the PDG code was adapted from the UniGen souce
+code, see:
+http://www.gsi.de/forschung/helmholtz-vi/unigen/index_e.html

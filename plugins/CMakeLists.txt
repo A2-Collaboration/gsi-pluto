@@ -1,0 +1,21 @@
+cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
+
+add_subdirectory(eta_decays)
+add_subdirectory(w_decays)
+add_subdirectory(strangeness)
+add_subdirectory(pion_beam)
+add_subdirectory(beamline)
+add_subdirectory(pdg_unigen)
+add_subdirectory(tools)
+add_subdirectory(scatter_mod)
+add_subdirectory(fairroot)
+add_subdirectory(elementary)
+add_subdirectory(dalitz_mod)
+add_subdirectory(brems)
+add_subdirectory(hades)
+add_subdirectory(nucleus_fermi)
+
+
+SET(PLUGIN_CLASSES "${PLUGIN_CLASSES}" PARENT_SCOPE)
+SET(PLUGIN_CLASSES_NAMES "${PLUGIN_CLASSES_NAMES}" PARENT_SCOPE)
+SET(PLUGIN_COLLECTION "${PLUGIN_COLLECTION}" PARENT_SCOPE)
