@@ -9,6 +9,15 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 
+# Pluto related files
+libPluto.so
+Plugins.h
+Plugins.cc
+PluginLinkDef.h
+Compiled.h
+G__Pluto*
+DartConfiguration.tcl
+
 # various autosave files
 *.swp
 *.autosave
