@@ -1,20 +1,25 @@
-## A2 Fork of the Pluto Event Simulator
+A2 Fork of the Pluto Event Simulator
+====================================
 
 Unofficial fork of Pluto, based on the test release Version 6.00 of 17/05/2017.
+
 Official website: http://www-hades.gsi.de/?q=pluto
 
 
 
 Installation:
-_____________________________________________________
+=============
 
 Standard installation:
+----------------------
+
 cmake .
 make
 
 
 Release Notes:
-_____________________________________________________
+==============
+
 
 v3.54:
 ======
