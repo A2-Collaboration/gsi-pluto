@@ -64,7 +64,7 @@ file(GLOB INCL_FILES RELATIVE "${CMAKE_SOURCE_DIR}" "include/*.h" )
 SET(INCL_FILES ${INCL_FILES} ${PHDRS})
 
 
-MESSAGE( STATUS "INCL_FILES: " ${INCL_FILES} )
+#MESSAGE( STATUS "INCL_FILES: " ${INCL_FILES} )
 
 # You need to tell CMake where to find the ROOT installation. This can be done in a number of ways:
 #   - ROOT built with classic configure/make use the provided $ROOTSYS/etc/cmake/FindROOT.cmake
@@ -73,7 +73,11 @@ MESSAGE( STATUS "INCL_FILES: " ${INCL_FILES} )
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} $ENV{ROOTSYS}/etc/cmake)
 
 #---Locate the ROOT package and defines a number of variables (e.g. ROOT_INCLUDE_DIRS)
-find_package(ROOT REQUIRED COMPONENTS RIO Net)
+find_package(ROOT "6.00" REQUIRED COMPONENTS RIO Net)
+if(ROOT_VERSION LESS 6.00)
+	message(FATAL_ERROR "The required ROOT version has to be at least 6.00, found " ${ROOT_VERSION})
+endif()
+message(STATUS "Found ROOT version: " ${ROOT_VERSION})
 
 #---Define useful ROOT functions and macros (e.g. ROOT_GENERATE_DICTIONARY)
 include(${ROOT_USE_FILE})
