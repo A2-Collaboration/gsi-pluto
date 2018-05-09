@@ -63,7 +63,6 @@ SET(SOURCES ${SOURCES} ${PLUGIN_CLASSES})
 file(GLOB INCL_FILES RELATIVE "${CMAKE_SOURCE_DIR}" "include/*.h" )
 SET(INCL_FILES ${INCL_FILES} ${PHDRS})
 
-#set (INCL_FILES PAdaptiveMesh.h PAdaptiveMeshN.h PAngularDistribution.h PAnyDistribution.h PArray.h PBatch.h PBeamSmearing.h PBreitWigner.h PBulkInterface.h PChannel.h PChannelModel.h PCommandList.h PComplexBreitWigner.h PCross.h PDalitzDecay.h PDalitzDistribution.h PData.h PDataBase.h PDebugFileOutput.h PDecayChannel.h PDecayManager.h PDeltaAngularDistribution.h PDensityMatrix.h PDiLepton.h PDistribution.h PDistributionCollection.h PDistributionManager.h PDistributionManagerUtil.h PDynamicData.h PEEDirectDecay.h PEmbeddedParticles.h PF1.h PF2.h PF3.h PFermiMomentumDD.h PFermiMomentum.h PFileInput.h PFileOutput.h PFilter.h PFireball.h PFixedDecay.h PFixedProduction.h PFormula.h PFunction.h PGenBod.h PHadronDecay.h PHadronDecayM1.h PHadronDecayM1N.h PHadronDecayM2.h PHadronDecayM3.h PHadronModel.h PInclusiveModel.h PMassSampling.h PMesh.h PParticle.h PPiOmegaAngularDistribution.h PPlutoBulkDecay.h PProjector.h PPropagator.h PReaction.h PSaid.h PScatterDistribution.h PSimpleVMDFF.h PStaticData.h PStdData.h PStdModels.h PTCrossWeight.h PThermal.h PUtils.h PValues.h PVertexFile.h ${PHDRS})
 
 MESSAGE( STATUS "INCL_FILES: " ${INCL_FILES} )
 
@@ -81,7 +80,7 @@ include(${ROOT_USE_FILE})
 
 ##LIST(APPEND INCL_FILES ${PHDRS})
 
-#include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 ROOT_GENERATE_DICTIONARY(G__Pluto ${INCL_FILES} LINKDEF PlutoLinkDef.h)
 
 #---Create a shared library with geneated dictionary
