@@ -10,9 +10,6 @@ Official website: http://www-hades.gsi.de/?q=pluto
 Installation:
 =============
 
-Standard installation:
-----------------------
-
 cmake .
 make
 
