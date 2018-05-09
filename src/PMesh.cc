@@ -28,7 +28,7 @@ PMesh::PMesh(Int_t psize, const Char_t *name) : TF1(name, "0", 0, 1) {
     fXmax      = 0.;
 
     fNpx       = psize-1;
-    fType      = 0;
+    fType      = kFormula;
     //    fFunction  = 0;
     fNdim = 1;
     

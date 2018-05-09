@@ -87,7 +87,7 @@ PDistribution::PDistribution(const Char_t *id, const Char_t *de):
     fXmax      = 0.;
     
     fNpx       = 1;
-    fType      = 0;
+    fType      = kFormula;
     //    fFunction  = 0;
     fNdim = 1;
     //... to be overwritten by PChannelModel
