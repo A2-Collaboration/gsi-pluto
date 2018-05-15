@@ -550,7 +550,7 @@ TObjArray *PStdModels::GetModels(void) {
 			GetParticleTotalWidth(tid[2]) < unstable_width ) 
 			n2 = 0; // too narrow
 		    
-		    int h = makeStaticData()->IsParticleHadron(tid[1])*
+		    int h = makeStaticData()->IsParticleHadron(tid[1])+
 			makeStaticData()->IsParticleHadron(tid[2]);
 
 		    /* Decay of a hadron in 1 stable and 1 unstable product */
@@ -610,8 +610,8 @@ TObjArray *PStdModels::GetModels(void) {
 		} /* END 2 products */
 
 		if ((tid[0] == 3) && (!decay_has_composite)) {
-		    int h=makeStaticData()->IsParticleHadron(tid[1])*
-			makeStaticData()->IsParticleHadron(tid[2])*
+		    int h=makeStaticData()->IsParticleHadron(tid[1])+
+			makeStaticData()->IsParticleHadron(tid[2])+
 			makeStaticData()->IsParticleHadron(tid[3]);
 		    /* 3 decay products */
 
