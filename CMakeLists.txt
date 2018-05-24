@@ -82,6 +82,9 @@ message(STATUS "Found ROOT version: " ${ROOT_VERSION})
 #---Define useful ROOT functions and macros (e.g. ROOT_GENERATE_DICTIONARY)
 include(${ROOT_USE_FILE})
 
+# explicitly tell the linker to use the EG library to resolve linker problems with TDatabasePDG::Instance()
+set(DEFAULT_LINKER_FLAGS "-lEG")
+
 ##LIST(APPEND INCL_FILES ${PHDRS})
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
