@@ -155,7 +155,9 @@ bool PPlutoBulkDecay::Modify(PParticle ** stack, int *decay_done, int * num, int
 		    d_ch->SetPrintTentative(0);
  		    d_ch->Init();
 
-		    d_ch->PrintNew();
+            if (pluto_global::verbosity) {
+                d_ch->PrintNew();
+            }
 		    d_ch->SetPrintTentative(1);
 
 		    Int_t error_count = 0;
