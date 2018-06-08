@@ -375,7 +375,9 @@ Bool_t PProjector::AddInputTNtuple(TNtuple *n,const  char *command) {
 	if (key_list_in[batch_pos-1][key_pos_in[batch_pos-1]] < 0) {
 	    key_list_in[batch_pos-1][key_pos_in[batch_pos-1]] = makeStaticData()->
 		MakeDirectoryEntry("batch_objects", NBATCH_NAME, LBATCH_NAME, name);
-	    Info("AddInputTNtuple", "Created variable %s for the TNtuple branch", name);
+        if (pluto_global::verbosity >= 3) {
+            Info("AddInputTNtuple", "Created variable %s for the TNtuple branch", name);
+        }
 	}
 
 	//Check if double is existing
@@ -593,7 +595,9 @@ Bool_t PProjector::Modify(PParticle **mstack, int *decay_done, int * num, int st
 	    if (fp_in[i]) {
 		//read the ntuple
 		if (num_events_in_c[i] == num_events_in[i]) {
-		    Info("Modify", "NTuple <%s>: number of events reached", fp_in[i]->GetTitle());
+            if (pluto_global::verbosity) {
+                Info("Modify", "NTuple <%s>: number of events reached", fp_in[i]->GetTitle());
+            }
 		    return kFALSE;
 		}
 
@@ -682,7 +686,9 @@ Bool_t PProjector::Modify(PParticle **mstack, int *decay_done, int * num, int st
 	    retval &= ~kUPDATE;
 	} 
 	if (retval & kEOF) {
-	    Info("Modify", "EOF reached");
+        if (pluto_global::verbosity) {
+            Info("Modify", "EOF reached");
+        }
 	    return kFALSE;
 	} 
 	if (retval & kFOREACH) {

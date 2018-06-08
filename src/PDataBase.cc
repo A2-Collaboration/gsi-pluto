@@ -53,7 +53,9 @@ PDataBase::PDataBase() {
 
     MakeParamString("name", "Database name"); 
 //this is absolute minimum and required for testing for existence
-    Info("PDataBase()", "(%s)", PRINT_CTOR);
+    if (pluto_global::verbosity >= 3) {
+        Info("PDataBase()", "(%s)", PRINT_CTOR);
+    }
 }
 
 

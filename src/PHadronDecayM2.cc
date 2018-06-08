@@ -97,7 +97,9 @@ Bool_t PHadronDecayM2::GetWidth(Double_t mass, Double_t *width, Int_t) {
 
     if (!makeStaticData()->GetPWidx(is_channel)) { // Enter below only on the first call
 
-	Info("GetWidth", "Called for %s", makeStaticData()->GetDecayName(is_channel));
+        if (pluto_global::verbosity) {
+            Info("GetWidth", "Called for %s", makeStaticData()->GetDecayName(is_channel));
+        }
 
 	makeDynamicData()->GetParticleDepth(parent_id); // if 1st call will initialize flags
 

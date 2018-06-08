@@ -354,7 +354,9 @@ PParticle & PParticle::operator += ( const PParticle & p) {
     make_new_qParticle=kTRUE;
     qParticle1 = new PParticle(this); 
     qParticle2 = new PParticle(p);
-    Info("operator+","(%s) Keeping beam and target particle for further reference", PRINT_AUTO_ALLOC);
+    if (pluto_global::verbosity >= 3) {
+        Info("operator+","(%s) Keeping beam and target particle for further reference", PRINT_AUTO_ALLOC);
+    }
     make_new_qParticle=kTRUE;
     if (makeDataBase()->GetEntryInt("pid", id2+ID())<0) {
 	Int_t len=strlen(makeStaticData()->GetParticleName(ID()))+
@@ -371,8 +373,10 @@ PParticle & PParticle::operator += ( const PParticle & p) {
 	    sprintf(delme2,"%s+%s",makeStaticData()->GetParticleName(ID()),
 		    makeStaticData()->GetParticleName(p.ID()));
 	    makeStaticData()->AddAlias(delme,delme2);
-	    Info("operator+","(%s) The composite %s has been added", 
-		 PRINT_AUTO_ALLOC,makeStaticData()->GetParticleName(id2+ID()));
+        if (pluto_global::verbosity) {
+            Info("operator+","(%s) The composite %s has been added",
+                 PRINT_AUTO_ALLOC,makeStaticData()->GetParticleName(id2+ID()));
+        }
 	}
     }
 
@@ -425,8 +429,10 @@ void PParticle::Scatter(PParticle *p1, PParticle *p2) {
 	    sprintf(delme2,"%s+%s",makeStaticData()->GetParticleName(id1),
 		    makeStaticData()->GetParticleName(id2));
 	    makeStaticData()->AddAlias(delme,delme2);
-	    Info("Scatter","(%s) The composite %s has been added", 
-		 PRINT_AUTO_ALLOC,makeStaticData()->GetParticleName(pid));
+        if (pluto_global::verbosity) {
+            Info("Scatter","(%s) The composite %s has been added",
+                 PRINT_AUTO_ALLOC,makeStaticData()->GetParticleName(pid));
+        }
 	}
     }
 

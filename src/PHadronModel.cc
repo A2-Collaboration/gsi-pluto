@@ -82,8 +82,10 @@ Bool_t PHadronModel::GetWidth(Double_t mass, Double_t *width, Int_t didx) {
 	mmax = PData::UMass(is_pid);   // mass ceiling
 	dm   = (mmax-mmin)/(maxmesh-3.); // mass increment for the mesh
  
-	Info("GetWidth", "Width 1st call for %s, mass range %f GeV to %f GeV",
-	     description, mmin, mmax);
+    if (pluto_global::verbosity >= 3) {
+        Info("GetWidth", "Width 1st call for %s, mass range %f GeV to %f GeV",
+             description, mmin, mmax);
+    }
 
 	while (self_consistency_loop) {
 	    // The mass-dependent width is evaluated on a mesh as a function of mass.

@@ -336,10 +336,12 @@ Bool_t PReaction::parse_script(const char *command,
 	pt.RotateY(-beam_theta2);
 	pt.RotateZ(beam_phi1);
 
-	cout << "<Beam>" << endl;
-	pb.Print();	
-	cout << "<Target>" << endl;
-	pt.Print();
+    if (pluto_global::verbosity >= 5) {
+        cout << "<Beam>" << endl;
+        pb.Print();
+        cout << "<Target>" << endl;
+        pt.Print();
+    }
 
 	PParticle *q = new PParticle(pb+pt);
 
@@ -1272,7 +1274,8 @@ int PReaction::Loop(int nevents, int wf, int verbose) {
 	
 	if (pre_heating) {
 	    pre_heating--;
-	    if (pre_heating == 1) Info("Loop()","Preheating done");
+        if (pre_heating == 1 && pluto_global::verbosity > 1)
+            Info("Loop()","Preheating done");
 	    goto repeat2;            // dummy, repeat event
 	}
 	

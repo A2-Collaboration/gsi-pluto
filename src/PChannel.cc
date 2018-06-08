@@ -421,7 +421,9 @@ void PChannel::IdChannel() {
     //the spectator is removed from the list, and the parent id replaced by
     //the dummy composite
     
-    Info("IdChannel", "(%s) Quasi-free production", PRINT_AUTO_ALLOC);
+    if (pluto_global::verbosity) {
+        Info("IdChannel", "(%s) Quasi-free production", PRINT_AUTO_ALLOC);
+    }
 
     n--;
   

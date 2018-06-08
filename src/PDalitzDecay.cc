@@ -274,8 +274,10 @@ Bool_t PDalitzDecay::GetWidth(Double_t mass, Double_t *width, Int_t) {
 	mass_ceiling   = PData::LMass(other_pid);
 
 #ifdef INGO_DEBUG
-	Info("GetWidth", "Creating mesh in %s (%f,%f)", makeStaticData()-> GetDecayName(is_channel),
-	     mass_threshold, mass_ceiling);
+	if (pluto_global::verbosity >= 3) {
+	    Info("GetWidth", "Creating mesh in %s (%f,%f)", makeStaticData()-> GetDecayName(is_channel),
+		 mass_threshold, mass_ceiling);
+	}
 #endif
     
 	mesh = new PMesh(maxmesh-2, "mesh");

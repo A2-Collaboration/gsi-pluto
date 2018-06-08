@@ -128,7 +128,9 @@ Bool_t PDensityMatrix::ReadDensityMatrix(const char *filename, Int_t dim, Bool_t
     //  matrix->SetMatrix(2);
     //uses the values f2 as defined above
 
-    Info("ReadDensityMatrix", "Analysing the file...");
+    if (pluto_global::verbosity) {
+        Info("ReadDensityMatrix", "Analysing the file...");
+    }
 
     Double_t  numbers[16];
     dimension = dim;
@@ -215,19 +217,21 @@ Bool_t PDensityMatrix::ReadDensityMatrix(const char *filename, Int_t dim, Bool_t
 	}
     }
 
-    if (!found_single_numbers) 
-	Info("ReadDensityMatrix", "...done (no sections found)");
-    else
-	Info("ReadDensityMatrix", "...done");
+    if (pluto_global::verbosity) {
+        if (!found_single_numbers)
+        Info("ReadDensityMatrix", "...done (no sections found)");
+        else
+        Info("ReadDensityMatrix", "...done");
 
-    Info("ReadDensityMatrix", "Dimension 1 (_x) has %i bins within the range [%f,%f]", 
-	 axes_size[0], (axes[0])[0], (axes[0])[axes_size[0]-1]);
-    if (dimension > 1)
-	Info("ReadDensityMatrix", "Dimension 2 (_y) has %i bins within the range [%f,%f]", 
-	     axes_size[1], (axes[1])[0], (axes[1])[axes_size[1]-1]);
-    if (dimension > 2)
-	Info("ReadDensityMatrix", "Dimension 3 (_z) has %i bins within the range [%f,%f]", 
-	     axes_size[2], (axes[2])[0], (axes[2])[axes_size[2]-1]);
+        Info("ReadDensityMatrix", "Dimension 1 (_x) has %i bins within the range [%f,%f]",
+         axes_size[0], (axes[0])[0], (axes[0])[axes_size[0]-1]);
+        if (dimension > 1)
+        Info("ReadDensityMatrix", "Dimension 2 (_y) has %i bins within the range [%f,%f]",
+             axes_size[1], (axes[1])[0], (axes[1])[axes_size[1]-1]);
+        if (dimension > 2)
+        Info("ReadDensityMatrix", "Dimension 3 (_z) has %i bins within the range [%f,%f]",
+             axes_size[2], (axes[2])[0], (axes[2])[axes_size[2]-1]);
+    }
 
     //TODO: check axis size against dim and DENSITYMATRIX_MAX_MATRICES
 
@@ -263,10 +267,14 @@ Bool_t PDensityMatrix::ReadDensityMatrix(const char *filename, Int_t dim, Bool_t
 	
 	if (numargs == 1) {
 	    if (numbers[0] >= min_selection && numbers[0] <= max_selection) {
-		Info("ReadDensityMatrix", "Found section [%f], reading...", numbers[0]);
+            if (pluto_global::verbosity) {
+                Info("ReadDensityMatrix", "Found section [%f], reading...", numbers[0]);
+            }
 		found_selection = kTRUE;
 	    } else {
-		Info("ReadDensityMatrix", "Found section [%f], skipped!", numbers[0]);
+            if (pluto_global::verbosity) {
+                Info("ReadDensityMatrix", "Found section [%f], skipped!", numbers[0]);
+            }
 		found_selection = kFALSE;
 	    }
 	} else if (found_selection) {

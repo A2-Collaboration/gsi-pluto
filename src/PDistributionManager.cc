@@ -58,7 +58,9 @@ PDistributionManager::PDistributionManager() {
 
     SetGroup("user");
 
-    Info("PDistributionManager()", "(%s)", PRINT_CTOR);
+    if (pluto_global::verbosity >= 3) {
+        Info("PDistributionManager()", "(%s)", PRINT_CTOR);
+    }
 }
 
 int PDistributionManager::Attach(PChannel *ch) {
@@ -83,7 +85,9 @@ void PDistributionManager::ActivateStdModels(void) {
 	std_models->Add(pdmutil);
 
         pdmutil->no_warning = kFALSE;
-	Info("Attach", "Re-iteration of std plugin done");
+    if (pluto_global::verbosity) {
+        Info("Attach", "Re-iteration of std plugin done");
+    }
 	pdmutil->LinkDB(); 
     }    
 }
@@ -123,7 +127,9 @@ Bool_t PDistributionManager::Activate(const char *name) {
 		Exec(depname);
 	    }
 	    if (collect[i]->Activate()) {
-		Info("Exec", "Plugin <%s> activated", name);
+            if (pluto_global::verbosity) {
+                Info("Exec", "Plugin <%s> activated", name);
+            }
 		collect[i]->SetEnable(1);
 		collect[i]->SetActivated(1);
 		SetGroup("user");
@@ -195,8 +201,10 @@ Bool_t PDistributionManager::Exec(const char *command) {
     return kFALSE;
 };
 
-void PDistributionManager::PluginInfo(const char *info) {   
-    Info("PDistributionManager", info);
+void PDistributionManager::PluginInfo(const char *info) {
+    if (pluto_global::verbosity) {
+        Info("PDistributionManager", info);
+    }
 };
 
 

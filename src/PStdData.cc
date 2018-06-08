@@ -42,7 +42,9 @@ PStdData *makeStdData() {
 }
 
 PStdData::PStdData() {
-    Info("PStdData()", "(%s)", PRINT_CTOR);
+    if (pluto_global::verbosity >= 3) {
+        Info("PStdData()", "(%s)", PRINT_CTOR);
+    }
     disable = 0;
 }
 

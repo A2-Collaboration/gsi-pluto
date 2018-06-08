@@ -143,7 +143,7 @@ PStaticData::PStaticData() {
     makeDataBase()->SetParamDouble ("D+", "umass", 3.);
 
     system_alloc_verbosity = GetBatchValue("_system_alloc_verbosity");
-    (*system_alloc_verbosity) = 1.;
+    (*system_alloc_verbosity) = pluto_global::verbosity;
 
     *GetBatchValue("_system_weight_version") = 1.;
     *GetBatchValue("_system_unstable_width") = 0.0001;

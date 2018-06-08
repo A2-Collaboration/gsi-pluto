@@ -149,7 +149,9 @@ PDecayManager::PDecayManager() {
 
     pdist = makeDistributionManager(); //create static object, if not yet done
 
-    Info("PDecayManager()", "(%s)", PRINT_CTOR);
+    if (pluto_global::verbosity >= 3) {
+        Info("PDecayManager()", "(%s)", PRINT_CTOR);
+    }
 
     fileoutput_pos = 0;
     bulkdecay_pos  = pro_bulkdecay_pos = 0;
