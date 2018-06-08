@@ -947,6 +947,8 @@ void PReaction::InitLoop() {
 	    tree->Branch("Impact", event_impact_param, "Impact/D");
 	    tree->Branch("Phi",    event_plane, "Phi/D");
 	    tree->Branch("Particles", &(evt[0]),32000,99);
+	    tree->Branch("plutoID", &event_counter);
+	    tree->Branch("plutoRandomID", &event_rndid);
 	    for (int br=0; br<size_branches; br++) {
 		if (key_branches[br] != -1) {
 		    if (!evt[br+1]) evt[br+1] = new TClonesArray("PParticle", size);
@@ -988,6 +990,12 @@ void PReaction::InitLoop() {
 }
 
 int PReaction::Loop(int nevents, int wf, int verbose) {
+
+    // Init Random IDs
+    event_counter=-1;
+    event_rndid=-1;
+    rng.SetSeed();
+
     // Simulate "nevents" events
 
     // double initialWeight = 1.;
@@ -1084,6 +1092,9 @@ int PReaction::Loop(int nevents, int wf, int verbose) {
     makeDistributionManager()->Startup();
 
     for (i=0;(i<nevents) || (nevents<0);++i) {                // number of events to generate
+	event_counter = i;
+	event_rndid = rng.Rndm()*(Long64_t(1)<<63);
+
 	//l1=0;
 
 	//In the prologue all particles are undecayed

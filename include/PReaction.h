@@ -19,6 +19,7 @@
 #include "PBulkInterface.h"
 #include "PProjector.h"
 #include "PPlutoBulkDecay.h"
+#include "TRandom2.h"
 
 #define MAX_FILEOUTPUT 5
 
@@ -423,6 +424,12 @@ class PReaction : public TObject  {
 			  float*, float*, float*, float*,
 			  float*, float*, float*, float*) {;}
     // dummy HGeant interface.  Comment to make HGeant routine visible!
+
+
+    Long64_t event_counter;
+    Long64_t event_rndid;
+
+    TRandom2 rng;
 
 
     Int_t pre_heating;
