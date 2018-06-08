@@ -76,6 +76,12 @@ Int_t PReaction::globalEventCounter = 0;
 TClonesArray *PReaction::evt[MAX_NUM_BRANCHES+1];
 Int_t PReaction::activeCnt = 0;
 
+// set global verbosity level
+void PReaction::setVerbosity(const int verbosity)
+{
+    pluto_global::verbosity = verbosity;
+}
+
 ClassImp(PReaction)
 
 // define option flags

@@ -65,6 +65,9 @@ class PReaction : public TObject  {
     ~PReaction();
     // Reaction destructor
 
+    // set globally defined verbosity level
+    void setVerbosity(const int verbosity = 0);
+
     void InitChannels();
 
     int loop(int i=-1, int wf=0, int verbose=1) {
