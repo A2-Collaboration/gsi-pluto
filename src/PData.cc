@@ -29,6 +29,9 @@ const long double hbar = 6.582122e-25; // units of (GeV s)
 #include "PUtils.h"                               // utilities class
 #include "TF2.h"
 
+int pluto_global::verbosity = 0;
+
+
 int PData::LPW(const int &id, const int &i1, const int &i2) {
     // lowest allowed transition partial wave for the decay
     // of a hadron (id) to two hadrons (i1 & i2).

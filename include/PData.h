@@ -6,6 +6,11 @@
 #ifndef _PDATA_H_
 #define _PDATA_H_
 
+
+// global verbosity level
+#include "Pglobal.h"
+
+
 #include "TROOT.h"
 #include "TMath.h"
 #include <iostream>

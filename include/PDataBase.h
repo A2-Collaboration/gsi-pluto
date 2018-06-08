@@ -10,6 +10,7 @@
 #include "TROOT.h"
 #include <iostream>
 #include "PDefines.h"
+#include "Pglobal.h"  // global verbosity level
 
 #define PDATABASE_MAX_DOUBLE_PARAM 20
 #define PDATABASE_MAX_STRING_PARAM 20
