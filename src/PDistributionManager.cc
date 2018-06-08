@@ -85,7 +85,7 @@ void PDistributionManager::ActivateStdModels(void) {
 	std_models->Add(pdmutil);
 
         pdmutil->no_warning = kFALSE;
-    if (pluto_global::verbosity) {
+    if (pluto_global::verbosity >= 3) {
         Info("Attach", "Re-iteration of std plugin done");
     }
 	pdmutil->LinkDB(); 

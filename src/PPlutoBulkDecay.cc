@@ -75,7 +75,7 @@ bool PPlutoBulkDecay::Modify(PParticle ** stack, int *decay_done, int * num, int
 		    PChannel* d_ch;
 		    
 		    if (!makeDataBase()->GetParamTObj (didx, channel_idx , stackchannel, &ch)) {
-                if (pluto_global::verbosity >= 3) {
+                if (pluto_global::verbosity) {
                     Info("Modify", "(%s) Making new channel for didx %i", PRINT_AUTO_ALLOC, channel_idx);
                 }
 

@@ -484,7 +484,7 @@ TObjArray *PStdModels::GetModels(void) {
 
     arr = new TObjArray();
 
-    if (pluto_global::verbosity) {
+    if (pluto_global::verbosity >= 3) {
         Info("GetModels", "Read std models");
     }
 
