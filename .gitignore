@@ -22,3 +22,7 @@ DartConfiguration.tcl
 *.swp
 *.autosave
 *~
+
+# QtCreator
+CMakeLists.txt.user
+pluto.cbp
