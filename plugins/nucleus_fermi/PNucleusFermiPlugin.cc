@@ -46,6 +46,7 @@ PNucleusFermiPlugin::PNucleusFermiPlugin(const Char_t *id, const Char_t *de):
 Bool_t PNucleusFermiPlugin::Activate(void) {
 
     //To be consistent:
+    makeStaticData()->AddAlias("t","3H");
     makeStaticData()->AddAlias("He3","3He");
     makeStaticData()->AddAlias("alpha","4He");
     
@@ -348,7 +349,8 @@ Bool_t PNucleusFermiPlugin::ExecCommand(const char * command, Double_t value) {
 	pmodel->Add("g,granddaughter,p2");
 	pdmutil->Add(pmodel);
 
-	//4He
+	//4He (n spectator)
+	//*****************
 	makeStaticData()->AddParticle(47001,"g + 4He",3.727379); 
 	makeStaticData()->AddAlias("g + 4He","g+4He");
 	makeStaticData()->AddDecay(-1, "g + 4He -> (g + n) + 3He (quasi-free)",
@@ -362,6 +364,21 @@ Bool_t PNucleusFermiPlugin::ExecCommand(const char * command, Double_t value) {
 	pmodel->Add("3He,daughter,spectator");
 	pmodel->Add("q,daughter,composite");
 	pmodel->Add("n,granddaughter,participant"); 
+	pmodel->Add("g,granddaughter,p2");
+	pdmutil->Add(pmodel);
+
+	//(p spectator)
+	makeStaticData()->AddDecay(-1, "g + 4He -> (g + p) + 3H (quasi-free)",
+				   "g + 4He","g + p,3H", 1.0 );
+	pmodel =
+	    new PFermiMomentumGA("gp_in_4He@g + 4He_to_g + p_3H",
+				 "Quasi-free particle production <nucleus_fermi>",-1);
+	pmodel->Add("q,parent");
+	pmodel->Add("g,grandparent,beam");
+	pmodel->Add("4He,grandparent,target");
+	pmodel->Add("3H,daughter,spectator");
+	pmodel->Add("q,daughter,composite");
+	pmodel->Add("p,granddaughter,participant");
 	pmodel->Add("g,granddaughter,p2");
 	pdmutil->Add(pmodel);
 
