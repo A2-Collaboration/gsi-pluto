@@ -4,10 +4,11 @@
 #include "PDistributionManagerUtil.h"
 #include "PDistributionCollection.h"
 
-#include "PRadiativeCorrections.h"
-
+#include "PRadiativeCorrectionsElectron.h"
+#include "PRadiativeCorrectionsMuon.h"
 
 using namespace std;
+
 
 class PDalitzCorrectionsPlugin : public PDistributionCollection {
 
@@ -23,8 +24,7 @@ class PDalitzCorrectionsPlugin : public PDistributionCollection {
 
  private:
 
-    PRadiativeCorrections *rad_corrections;
-
+    PRadiativeCorrections *rad_corrections_ee, *rad_corrections_mumu;
 
     ClassDef(PDalitzCorrectionsPlugin,0)
 };

@@ -1,6 +1,6 @@
 ###
 
-LOCAL_CLASSES    := PRadiativeCorrections PDalitzCorrectionsPlugin
+LOCAL_CLASSES    := PRadiativeCorrections PRadiativeCorrectionsElectron PRadiativeCorrectionsMuon PDalitzCorrectionsPlugin
 LOCAL_COLLECTION := PDistributionManager.mod.cc
 
 
