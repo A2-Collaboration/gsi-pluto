@@ -5,8 +5,8 @@ import numpy as np
 
 '''
 The intention of this script is to parse the ascii files provided in the source of the paper arxiv:1711.11001
-and dump them in a formatted way to a file which can be included via the TGraph2D constructor within the
-PDalitzCorrections Plugin. The correction factors are applied as a weight to the pseudo-scalar meson Dalitz decays.
+and dump them in a formatted way into a header file which can be included in the PDalitzCorrections plugin to
+create TGraph2D objects from it. The correction factors are applied as a weight to eta and eta' Dalitz decays
 '''
 
 def read_file(path):
@@ -38,33 +38,35 @@ def write_table(corrections, path):
         for val in corrections:
             f.write('%g %g %g\n' % val)
 
-def write_header(corrections, path, name='corrections'):
+def write_header(corrections, path, name):
     with open(path, 'w+') as f:
+        f.write('#ifndef __%s_CORRECTIONS__\n' % name.upper())
+        f.write('#define __%s_CORRECTIONS__\n\n' % name.upper())
         f.write('#include <vector>\n\n')
-        f.write('struct correction {\n')
-        f.write('\tdouble x;\n')
-        f.write('\tdouble y;\n')
-        f.write('\tdouble c;\n')
-        f.write('};\n\n')
-        f.write('static const std::vector<correction> %s = {' % name)
-        struct = "{%g, %g, %g}"
-        f.write(', '.join(map(lambda x : struct % x, corrections)))
-        f.write('};\n')
+        x, y, corr = zip(*corrections)
+        f.write('namespace %s {\n' % name)
+        f.write('    static std::vector<double> x = {%s};\n'
+                % ', '.join(map(str, x)))
+        f.write('    static std::vector<double> y = {%s};\n'
+                % ', '.join(map(str, y)))
+        f.write('    static std::vector<double> corr = {%s};\n}\n\n'
+                % ', '.join(map(str, corr)))
+        f.write('#endif')
     print('C++ header written to file:', path)
 
 def main():
     # eta -> e+ e- g
     corr = read_file('/home/sascha/1711.11001/anc/eta_e')
-    write_header(corr, 'eta_dilepton_radiative_corrections.h', 'eta_ee_corrections')
+    write_header(corr, 'eta_dilepton_radiative_corrections.h', 'eta_ee')
     # eta -> mu+ mu- g
     corr = read_file('/home/sascha/1711.11001/anc/eta_mu')
-    write_header(corr, 'eta_dimuon_radiative_corrections.h', 'eta_mumu_corrections')
+    write_header(corr, 'eta_dimuon_radiative_corrections.h', 'eta_mumu')
     # eta' -> e+ e- g
     corr = read_file('/home/sascha/1711.11001/anc/etap_e')
-    write_header(corr, 'etap_dilepton_radiative_corrections.h', 'etap_ee_corrections')
+    write_header(corr, 'etap_dilepton_radiative_corrections.h', 'etap_ee')
     # eta' -> mu+ mu- g
     corr = read_file('/home/sascha/1711.11001/anc/etap_mu')
-    write_header(corr, 'etap_dimuon_radiative_corrections.h', 'etap_mumu_corrections')
+    write_header(corr, 'etap_dimuon_radiative_corrections.h', 'etap_mumu')
 
 if __name__ == '__main__':
     main()

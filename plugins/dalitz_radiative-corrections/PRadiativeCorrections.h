@@ -25,8 +25,6 @@ class PRadiativeCorrections : public PChannelModel {
 
     PChannelModel *rad_corrections;
 
- private:
-    bool pi0, eta, etap;
 
     ClassDef(PRadiativeCorrections,0)
 };

@@ -10,15 +10,10 @@ PRadiativeCorrectionsElectron::PRadiativeCorrectionsElectron(const Char_t *id, c
 
     pi0 = eta = etap = false;
 
-    corrections_eta = new TGraph2D(eta_ee_corrections.size());
-    corrections_etap = new TGraph2D(etap_ee_corrections.size());
-
-    int i = 0;
-    for (const auto c : eta_ee_corrections)
-        corrections_eta->SetPoint(i++, c.x, c.y, c.c);
-    i = 0;
-    for (const auto c : etap_ee_corrections)
-        corrections_etap->SetPoint(i++, c.x, c.y, c.c);
+    corrections_eta = new TGraph2D("eta_ee_corrections", "Radiative Corrections #eta #to e^{+} e^{-} #gamma",
+                                   eta_ee::corr.size(), &eta_ee::x[0], &eta_ee::y[0], &eta_ee::corr[0]);
+    corrections_etap = new TGraph2D("etap_ee_corrections", "Radiative Corrections #eta' #to e^{+} e^{-} #gamma",
+                                    etap_ee::corr.size(), &etap_ee::x[0], &etap_ee::y[0], &etap_ee::corr[0]);
 
     // calling GetHistogram() method avoids Interpolate() returning 0 if an exact point is being interpolated
     corrections_eta->GetHistogram();

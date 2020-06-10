@@ -12,15 +12,10 @@ PRadiativeCorrectionsMuon::PRadiativeCorrectionsMuon(const Char_t *id, const Cha
 
     //TODO: include pi0 corrections
 
-    corrections_eta = new TGraph2D(eta_mumu_corrections.size());
-    corrections_etap = new TGraph2D(etap_mumu_corrections.size());
-
-    int i = 0;
-    for (const auto c : eta_mumu_corrections)
-        corrections_eta->SetPoint(i++, c.x, c.y, c.c);
-    i = 0;
-    for (const auto c : etap_mumu_corrections)
-        corrections_etap->SetPoint(i++, c.x, c.y, c.c);
+    corrections_eta = new TGraph2D("eta_mumu_corrections", "Radiative Corrections #eta #to #mu^{+} #mu^{-} #gamma",
+                                   eta_mumu::corr.size(), &eta_mumu::x[0], &eta_mumu::y[0], &eta_mumu::corr[0]);
+    corrections_etap = new TGraph2D("etap_mumu_corrections", "Radiative Corrections #eta' #to #mu^{+} #mu^{-} #gamma",
+                                    etap_mumu::corr.size(), &etap_mumu::x[0], &etap_mumu::y[0], &etap_mumu::corr[0]);
 
     // calling GetHistogram() method avoids Interpolate() returning 0 if an exact point is being interpolated
     corrections_eta->GetHistogram();
