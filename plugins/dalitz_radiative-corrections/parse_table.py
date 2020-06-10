@@ -38,19 +38,33 @@ def write_table(corrections, path):
         for val in corrections:
             f.write('%g %g %g\n' % val)
 
+def write_header(corrections, path, name='corrections'):
+    with open(path, 'w+') as f:
+        f.write('#include <vector>\n\n')
+        f.write('struct correction {\n')
+        f.write('\tdouble x;\n')
+        f.write('\tdouble y;\n')
+        f.write('\tdouble c;\n')
+        f.write('};\n\n')
+        f.write('static const std::vector<correction> %s = {' % name)
+        struct = "{%g, %g, %g}"
+        f.write(', '.join(map(lambda x : struct % x, corrections)))
+        f.write('};\n')
+    print('C++ header written to file:', path)
+
 def main():
     # eta -> e+ e- g
     corr = read_file('/home/sascha/1711.11001/anc/eta_e')
-    write_table(corr, 'eta_ee_corrections')
+    write_header(corr, 'eta_dilepton_radiative_corrections.h', 'eta_ee_corrections')
     # eta -> mu+ mu- g
     corr = read_file('/home/sascha/1711.11001/anc/eta_mu')
-    write_table(corr, 'eta_mumu_corrections')
+    write_header(corr, 'eta_dimuon_radiative_corrections.h', 'eta_mumu_corrections')
     # eta' -> e+ e- g
     corr = read_file('/home/sascha/1711.11001/anc/etap_e')
-    write_table(corr, 'etap_ee_corrections')
+    write_header(corr, 'etap_dilepton_radiative_corrections.h', 'etap_ee_corrections')
     # eta' -> mu+ mu- g
     corr = read_file('/home/sascha/1711.11001/anc/etap_mu')
-    write_table(corr, 'etap_mumu_corrections')
+    write_header(corr, 'etap_dimuon_radiative_corrections.h', 'etap_mumu_corrections')
 
 if __name__ == '__main__':
     main()

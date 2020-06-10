@@ -1,0 +1,15 @@
+Radiative corrections for Dalitz decays of pseudo-scalar mesons
+---------------------------------------------------------------
+
+By activating this plugin radiative corrections will be applied to the supported Dalitz decays.
+Those are currently eta(') --> e+ e- gamma as well as eta(') --> mu+ mu- gamma.
+Support for the pi0 Dalitz decay will be included soon.
+
+The header files including the correction factors have been created using the dump_table.py script
+which parses the values from an ascii file and formats them in a C++ way to be included as a header.
+
+To activate this plugin add the command
+    makeDistributionManager()->Exec("dalitz_corrections");
+to your Pluto macro. You should see a line similar to
+    [radiative_corrections_dilepton] Radiative corrections Dalitz decay {/corrections}
+at the end of the channels when the reaction of your Dalitz decay is printed.

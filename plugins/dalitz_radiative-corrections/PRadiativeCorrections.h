@@ -3,10 +3,6 @@
 
 #include "PChannelModel.h"
 
-#include <iostream>
-#include <string>
-
-#include "TSystem.h"
 #include "TGraph2D.h"
 
 class PRadiativeCorrections : public PChannelModel {
@@ -25,9 +21,6 @@ class PRadiativeCorrections : public PChannelModel {
     Bool_t IsValid();
 
  protected:
-
-    std::string get_base(const std::string&);
-
     PParticle *parent, *meson, *lp, *lm;
 
     PChannelModel *rad_corrections;

@@ -3,6 +3,8 @@
 
 #include "PRadiativeCorrections.h"
 
+#include "dilepton_radiative_corrections.h"
+
 class PRadiativeCorrectionsElectron : public PRadiativeCorrections {
 
   public:

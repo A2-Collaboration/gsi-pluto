@@ -12,9 +12,15 @@ PRadiativeCorrectionsMuon::PRadiativeCorrectionsMuon(const Char_t *id, const Cha
 
     //TODO: include pi0 corrections
 
-    const string pwd = get_base(__FILE__);
-    corrections_eta = new TGraph2D((pwd+"/eta_mumu_corrections").c_str());
-    corrections_etap = new TGraph2D((pwd+"/etap_mumu_corrections").c_str());
+    corrections_eta = new TGraph2D(eta_mumu_corrections.size());
+    corrections_etap = new TGraph2D(etap_mumu_corrections.size());
+
+    int i = 0;
+    for (const auto c : eta_mumu_corrections)
+        corrections_eta->SetPoint(i++, c.x, c.y, c.c);
+    i = 0;
+    for (const auto c : etap_mumu_corrections)
+        corrections_etap->SetPoint(i++, c.x, c.y, c.c);
 
     // calling GetHistogram() method avoids Interpolate() returning 0 if an exact point is being interpolated
     corrections_eta->GetHistogram();

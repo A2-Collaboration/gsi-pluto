@@ -10,10 +10,15 @@ PRadiativeCorrectionsElectron::PRadiativeCorrectionsElectron(const Char_t *id, c
 
     pi0 = eta = etap = false;
 
-    const string pwd = get_base(__FILE__);
-    cout << "current dir: " << pwd << endl;
-    corrections_eta = new TGraph2D((pwd+"/eta_ee_corrections").c_str());
-    corrections_etap = new TGraph2D((pwd+"/etap_ee_corrections").c_str());
+    corrections_eta = new TGraph2D(eta_ee_corrections.size());
+    corrections_etap = new TGraph2D(etap_ee_corrections.size());
+
+    int i = 0;
+    for (const auto c : eta_ee_corrections)
+        corrections_eta->SetPoint(i++, c.x, c.y, c.c);
+    i = 0;
+    for (const auto c : etap_ee_corrections)
+        corrections_etap->SetPoint(i++, c.x, c.y, c.c);
 
     // calling GetHistogram() method avoids Interpolate() returning 0 if an exact point is being interpolated
     corrections_eta->GetHistogram();

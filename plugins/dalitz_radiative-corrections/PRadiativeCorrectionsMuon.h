@@ -3,6 +3,8 @@
 
 #include "PRadiativeCorrections.h"
 
+#include "dimuon_radiative_corrections.h"
+
 class PRadiativeCorrectionsMuon : public PRadiativeCorrections {
 
   public:
