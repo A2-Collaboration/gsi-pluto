@@ -54,10 +54,9 @@ Bool_t PRadiativeCorrections::Init() {
 
     rad_corrections = GetSecondaryModel("corrections");
 
-
-    if (rad_corrections) {
-        Info("Init","Found radiative corrections");
-        rad_corrections->Print();
+    if (!rad_corrections) {
+        Warning("Init","Model for radiative corrections not found");
+        return kFALSE;
     }
 
     return kTRUE;
@@ -69,7 +68,6 @@ Bool_t PRadiativeCorrections::IsValid() {
 /*    if (GetVersionFlag() & VERSION_WEIGHTING) return kTRUE;
     //...but not if weighting enabled.
 */
-    cout << "+++ Calculate x and y in IsValid +++" << endl;
     meson = parent->GetParent();
     double q2 = parent->M2();
     double im2 = meson->M2();
@@ -78,7 +76,6 @@ Bool_t PRadiativeCorrections::IsValid() {
     y = 2*abs(y)/meson->M2()/(1-x);
     double nu2 = 4*lm->M2()/im2;
     double beta = sqrt(1-nu2/x);
-    cout << "[DEBUG]   x = " << x << "  y = " << y << endl;
     if ((x < nu2) || (x > 1.))
         return kFALSE;
     if ((y < 0.) || (y > beta))

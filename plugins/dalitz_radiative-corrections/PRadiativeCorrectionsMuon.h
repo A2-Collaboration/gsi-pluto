@@ -10,7 +10,7 @@ class PRadiativeCorrectionsMuon : public PRadiativeCorrections {
   public:
     PRadiativeCorrectionsMuon(){}
     PRadiativeCorrectionsMuon(const Char_t *id, const Char_t *de, Int_t key);
-    PDistribution* Clone(const char*delme=NULL) const;
+    PDistribution* Clone(const char*delme=NULL) const override;
 
     Double_t GetWeight() override;
 
