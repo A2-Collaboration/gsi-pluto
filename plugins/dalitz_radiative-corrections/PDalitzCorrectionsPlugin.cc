@@ -29,12 +29,10 @@ Bool_t PDalitzCorrectionsPlugin::ExecCommand(const char * command, Double_t valu
     //called the 1st time?
     if (!rad_corrections_ee) {
         rad_corrections_ee = new PRadiativeCorrectionsElectron("radiative_corrections_dilepton@dilepton_to_e+_e-/corrections", "Radiative corrections Dalitz decay", -1);
-        rad_corrections_ee->EnableWeighting();
         pdmutil->Add(rad_corrections_ee);
     }
     if (!rad_corrections_mumu) {
         rad_corrections_mumu = new PRadiativeCorrectionsMuon("radiative_corrections_dimuon@dimuon_to_mu+_mu-/corrections", "Radiative corrections Dalitz decay", -1);
-        rad_corrections_mumu->EnableWeighting();
         pdmutil->Add(rad_corrections_mumu);
     }
 

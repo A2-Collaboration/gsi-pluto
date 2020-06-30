@@ -20,6 +20,8 @@ PRadiativeCorrections::PRadiativeCorrections(const Char_t *id, const Char_t *de,
     meson = nullptr;
     lp = nullptr;
     lm = nullptr;
+
+    weight_max = 1.;
 }
 
 Bool_t PRadiativeCorrections::Init() {
@@ -65,9 +67,9 @@ Bool_t PRadiativeCorrections::Init() {
 Bool_t PRadiativeCorrections::IsValid() {
     //Use rejection mode...
 
-/*    if (GetVersionFlag() & VERSION_WEIGHTING) return kTRUE;
+    if (GetVersionFlag() & VERSION_WEIGHTING) return kTRUE;
     //...but not if weighting enabled.
-*/
+
     meson = parent->GetParent();
     double q2 = parent->M2();
     double im2 = meson->M2();
@@ -79,6 +81,17 @@ Bool_t PRadiativeCorrections::IsValid() {
     if ((x < nu2) || (x > 1.))
         return kFALSE;
     if ((y < 0.) || (y > beta))
+        return kFALSE;
+
+    // valid x and y values, do rejection now
+    double weight = GetWeight();
+    // weight 1 is returned if no value has been found in the correction tables
+    // return true in this case since weight_max can be smaller than 1
+    // (if only negative correction values are present)
+    if (weight == 1.)
+        return kTRUE;
+
+    if ((weight/weight_max) > PUtils::sampleFlat())
         return kFALSE;
 
     return kTRUE;

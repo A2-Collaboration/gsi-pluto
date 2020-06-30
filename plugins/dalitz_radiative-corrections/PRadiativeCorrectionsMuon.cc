@@ -26,8 +26,24 @@ PDistribution* PRadiativeCorrectionsMuon::Clone(const char*delme) const {
     return new PRadiativeCorrectionsMuon((const PRadiativeCorrectionsMuon &)* this);
 }
 
+void PRadiativeCorrectionsMuon::SetMaximumWeight()
+{
+    double correction = 0.;
+
+    if (parent->GetParent()->Is("eta"))
+        correction = corrections_eta->GetZmax();
+    else if (parent->GetParent()->Is("eta'"))
+        correction = corrections_etap->GetZmax();
+
+    weight_max += correction/100.;
+    weight_max_set = true;
+}
+
 Double_t PRadiativeCorrectionsMuon::GetWeight()
 {
+    if (!weight_max_set)
+        SetMaximumWeight();
+
     meson = parent->GetParent();
     eta = etap = false;
     if (!meson->IsMeson()) {

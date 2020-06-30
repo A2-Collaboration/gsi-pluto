@@ -15,6 +15,8 @@ class PRadiativeCorrectionsMuon : public PRadiativeCorrections {
     Double_t GetWeight() override;
 
   private:
+    void SetMaximumWeight() override;
+
     TGraph2D *corrections_pi0, *corrections_eta, *corrections_etap;
     bool eta, etap;
 

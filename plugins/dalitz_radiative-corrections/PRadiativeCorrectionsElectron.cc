@@ -24,8 +24,24 @@ PDistribution* PRadiativeCorrectionsElectron::Clone(const char*delme) const {
     return new PRadiativeCorrectionsElectron((const PRadiativeCorrectionsElectron &)* this);
 }
 
+void PRadiativeCorrectionsElectron::SetMaximumWeight()
+{
+    double correction = 0.;
+
+    if (parent->GetParent()->Is("eta"))
+        correction = corrections_eta->GetZmax();
+    else if (parent->GetParent()->Is("eta'"))
+        correction = corrections_etap->GetZmax();
+
+    weight_max += correction/100.;
+    weight_max_set = true;
+}
+
 Double_t PRadiativeCorrectionsElectron::GetWeight()
 {
+    if (!weight_max_set)
+        SetMaximumWeight();
+
     meson = parent->GetParent();
     pi0 = eta = etap = false;
     if (!meson->IsMeson()) {
