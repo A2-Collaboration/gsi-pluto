@@ -4,6 +4,7 @@
 #include "PChannelModel.h"
 
 #include "TGraph2D.h"
+#include "TH2D.h"
 
 class PRadiativeCorrections : public PChannelModel {
 
@@ -25,10 +26,11 @@ class PRadiativeCorrections : public PChannelModel {
 
     PChannelModel *rad_corrections;
 
-    virtual void SetMaximumWeight() = 0;
-    bool weight_max_set = false;
+    virtual void SetLimits() = 0;
+    bool limits_set;
 
     Double_t weight_max;
+    Double_t x_min;
 
 
     ClassDef(PRadiativeCorrections,0)

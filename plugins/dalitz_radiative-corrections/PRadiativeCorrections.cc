@@ -21,7 +21,9 @@ PRadiativeCorrections::PRadiativeCorrections(const Char_t *id, const Char_t *de,
     lp = nullptr;
     lm = nullptr;
 
+    limits_set = false;
     weight_max = 1.;
+    x_min = 0.;
 }
 
 Bool_t PRadiativeCorrections::Init() {

@@ -16,31 +16,33 @@ PRadiativeCorrectionsElectron::PRadiativeCorrectionsElectron(const Char_t *id, c
                                     etap_ee::corr.size(), &etap_ee::x[0], &etap_ee::y[0], &etap_ee::corr[0]);
 
     // calling GetHistogram() method avoids Interpolate() returning 0 if an exact point is being interpolated
-    corrections_eta->GetHistogram();
-    corrections_etap->GetHistogram();
+    h_corrections_eta = corrections_eta->GetHistogram();
+    h_corrections_etap = corrections_etap->GetHistogram();
 }
 
 PDistribution* PRadiativeCorrectionsElectron::Clone(const char*delme) const {
     return new PRadiativeCorrectionsElectron((const PRadiativeCorrectionsElectron &)* this);
 }
 
-void PRadiativeCorrectionsElectron::SetMaximumWeight()
+void PRadiativeCorrectionsElectron::SetLimits()
 {
-    double correction = 0.;
+    TGraph2D* corr;
 
     if (parent->GetParent()->Is("eta"))
-        correction = corrections_eta->GetZmax();
+        corr = corrections_eta;
     else if (parent->GetParent()->Is("eta'"))
-        correction = corrections_etap->GetZmax();
+        corr = corrections_etap;
 
-    weight_max += correction/100.;
-    weight_max_set = true;
+    weight_max += corr->GetZmax()/100.;
+    x_min = corr->GetXmin();
+
+    limits_set = true;
 }
 
 Double_t PRadiativeCorrectionsElectron::GetWeight()
 {
-    if (!weight_max_set)
-        SetMaximumWeight();
+    if (!limits_set)
+        SetLimits();
 
     meson = parent->GetParent();
     pi0 = eta = etap = false;
@@ -64,15 +66,21 @@ Double_t PRadiativeCorrectionsElectron::GetWeight()
     // use absolute value for y since correction values are just provided for positive y values
     // y should be symmetric so under this assumption everything should be fine
     y = 2*abs(y)/meson->M2()/(1-x);
+
+    // check if the current x value is smaller than the minimum provided in the correction tables
+    // if so, use the minimum x value instead to use this value instead
+    if (x < x_min)
+        x = x_min;
+
     double weight = 1.;
     double correction = 0.;
 
     if (pi0)
         correction = corrections_pi0->Interpolate(x, y);
     else if (eta)
-        correction = corrections_eta->Interpolate(x, y);
+        correction = h_corrections_eta->Interpolate(x, y);
     else if (etap)
-        correction = corrections_etap->Interpolate(x, y);
+        correction = h_corrections_etap->Interpolate(x, y);
     else
         Warning("GetWeight","No correction table found for this channel");
 

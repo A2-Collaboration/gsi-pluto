@@ -15,9 +15,10 @@ class PRadiativeCorrectionsElectron : public PRadiativeCorrections {
     Double_t GetWeight() override;
 
   private:
-    void SetMaximumWeight() override;
+    void SetLimits() override;
 
     TGraph2D *corrections_pi0, *corrections_eta, *corrections_etap;
+    TH2D *h_corrections_eta, *h_corrections_etap;
     bool pi0, eta, etap;
 
     ClassDef(PRadiativeCorrectionsElectron,0)

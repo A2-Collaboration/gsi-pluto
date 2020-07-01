@@ -26,23 +26,25 @@ PDistribution* PRadiativeCorrectionsMuon::Clone(const char*delme) const {
     return new PRadiativeCorrectionsMuon((const PRadiativeCorrectionsMuon &)* this);
 }
 
-void PRadiativeCorrectionsMuon::SetMaximumWeight()
+void PRadiativeCorrectionsMuon::SetLimits()
 {
-    double correction = 0.;
+    TGraph2D* corr;
 
     if (parent->GetParent()->Is("eta"))
-        correction = corrections_eta->GetZmax();
+        corr = corrections_eta;
     else if (parent->GetParent()->Is("eta'"))
-        correction = corrections_etap->GetZmax();
+        corr = corrections_etap;
 
-    weight_max += correction/100.;
-    weight_max_set = true;
+    weight_max += corr->GetZmax()/100.;
+    x_min = corr->GetXmin();
+
+    limits_set = true;
 }
 
 Double_t PRadiativeCorrectionsMuon::GetWeight()
 {
-    if (!weight_max_set)
-        SetMaximumWeight();
+    if (!limits_set)
+        SetLimits();
 
     meson = parent->GetParent();
     eta = etap = false;
@@ -63,6 +65,11 @@ Double_t PRadiativeCorrectionsMuon::GetWeight()
     double y = meson->Vect4().Dot(lp->Vect4()-lm->Vect4());
     // use absolute value for y since y should be symmetric
     y = 2*abs(y)/meson->M2()/(1-x);
+
+    // check if the current x value is smaller than the minimum provided in the correction tables
+    // if so, use the minimum x value instead to use this value instead
+    if (x < x_min)
+        x = x_min;
 
     double weight = 1.;
     double correction = 0.;
