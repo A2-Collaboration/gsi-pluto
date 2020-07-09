@@ -24,6 +24,7 @@ PRadiativeCorrections::PRadiativeCorrections(const Char_t *id, const Char_t *de,
     limits_set = false;
     weight_max = 1.;
     x_min = 0.;
+    x_max = y_max = -1.;
 }
 
 Bool_t PRadiativeCorrections::Init() {
@@ -64,6 +65,19 @@ Bool_t PRadiativeCorrections::Init() {
     }
 
     return kTRUE;
+}
+
+void PRadiativeCorrections::SetXminmax(const double y)
+{
+    if (!y_vals && !x_tuples)
+        Error("SetXminmax", "vectors for x and y value limits not assigned!");
+
+    size_t pos = 0;
+    while (pos < y_vals->size() && y > y_vals->at(pos+1))
+        pos++;
+
+    x_min = x_tuples->at(2*pos);
+    x_max = x_tuples->at(2*pos+1);
 }
 
 Bool_t PRadiativeCorrections::IsValid() {

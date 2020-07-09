@@ -30,43 +30,51 @@ def read_file(path):
     print('individual data points per y value:')
     for y in corrs.keys():
         print('{:.2f}: {:3d}'.format(y, len(corrs[y])))
+        # only keep first and last element for x min/max
+        corrs[y] = corrs[y][::len(corrs[y])-1]
 
-    return corrections
+    return corrections, corrs
 
 def write_table(corrections, path):
     with open(path, 'w+') as f:
         for val in corrections:
             f.write('%g %g %g\n' % val)
 
-def write_header(corrections, path, name):
+def write_header(corrections, limits, path, name):
     with open(path, 'w+') as f:
         f.write('#ifndef __%s_CORRECTIONS__\n' % name.upper())
         f.write('#define __%s_CORRECTIONS__\n\n' % name.upper())
         f.write('#include <vector>\n\n')
         x, y, corr = zip(*corrections)
+        print(limits.values())
+        x_tuples = [val for tuple in limits.values() for val in tuple]
         f.write('namespace %s {\n' % name)
         f.write('    static std::vector<double> x = {%s};\n'
                 % ', '.join(map(str, x)))
         f.write('    static std::vector<double> y = {%s};\n'
                 % ', '.join(map(str, y)))
-        f.write('    static std::vector<double> corr = {%s};\n}\n\n'
+        f.write('    static std::vector<double> corr = {%s};\n\n'
                 % ', '.join(map(str, corr)))
+        f.write('    static std::vector<double> y_vals = {%s};\n'
+                % ', '.join(map(str, limits.keys())))
+        f.write('    static std::vector<double> x_tuples = {%s};\n}\n\n'
+                % ', '.join(map(str, x_tuples)))
         f.write('#endif')
     print('C++ header written to file:', path)
 
 def main():
     # eta -> e+ e- g
-    corr = read_file('/home/sascha/1711.11001/anc/eta_e')
-    write_header(corr, 'eta_dilepton_radiative_corrections.h', 'eta_ee')
+    corr, limits = read_file('/home/sascha/1711.11001/anc/eta_e')
+    write_header(corr, limits, 'eta_dilepton_radiative_corrections.h', 'eta_ee')
     # eta -> mu+ mu- g
-    corr = read_file('/home/sascha/1711.11001/anc/eta_mu')
-    write_header(corr, 'eta_dimuon_radiative_corrections.h', 'eta_mumu')
+    corr, limits = read_file('/home/sascha/1711.11001/anc/eta_mu')
+    write_header(corr, limits, 'eta_dimuon_radiative_corrections.h', 'eta_mumu')
     # eta' -> e+ e- g
-    corr = read_file('/home/sascha/1711.11001/anc/etap_e')
-    write_header(corr, 'etap_dilepton_radiative_corrections.h', 'etap_ee')
+    corr, limits = read_file('/home/sascha/1711.11001/anc/etap_e')
+    write_header(corr, limits, 'etap_dilepton_radiative_corrections.h', 'etap_ee')
     # eta' -> mu+ mu- g
-    corr = read_file('/home/sascha/1711.11001/anc/etap_mu')
-    write_header(corr, 'etap_dimuon_radiative_corrections.h', 'etap_mumu')
+    corr, limits = read_file('/home/sascha/1711.11001/anc/etap_mu')
+    write_header(corr, limits, 'etap_dimuon_radiative_corrections.h', 'etap_mumu')
 
 if __name__ == '__main__':
     main()

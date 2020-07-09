@@ -27,10 +27,13 @@ class PRadiativeCorrections : public PChannelModel {
     PChannelModel *rad_corrections;
 
     virtual void SetLimits() = 0;
+    virtual void SetXminmax(const double);
     bool limits_set;
 
     Double_t weight_max;
-    Double_t x_min;
+    Double_t y_max, x_min, x_max;
+    std::vector<double>* y_vals = nullptr;
+    std::vector<double>* x_tuples = nullptr;
 
 
     ClassDef(PRadiativeCorrections,0)

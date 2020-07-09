@@ -28,19 +28,25 @@ void PRadiativeCorrectionsElectron::SetLimits()
 {
     TGraph2D* corr;
 
-    if (parent->GetParent()->Is("eta"))
+    if (parent->GetParent()->Is("eta")) {
         corr = corrections_eta;
-    else if (parent->GetParent()->Is("eta'"))
+        y_vals = &eta_ee::y_vals;
+        x_tuples = &eta_ee::x_tuples;
+    } else if (parent->GetParent()->Is("eta'")) {
         corr = corrections_etap;
+        y_vals = &etap_ee::y_vals;
+        x_tuples = &etap_ee::x_tuples;
+    }
 
     weight_max += corr->GetZmax()/100.;
-    x_min = corr->GetXmin();
+    y_max = corr->GetYmax();
 
     limits_set = true;
 }
 
 Double_t PRadiativeCorrectionsElectron::GetWeight()
 {
+    // Set limits here since the grandparent (meson) is not accesible during Init()
     if (!limits_set)
         SetLimits();
 
@@ -67,10 +73,17 @@ Double_t PRadiativeCorrectionsElectron::GetWeight()
     // y should be symmetric so under this assumption everything should be fine
     y = 2*abs(y)/meson->M2()/(1-x);
 
-    // check if the current x value is smaller than the minimum provided in the correction tables
-    // if so, use the minimum x value instead to use this value instead
-    if (x < x_min)
-        x = x_min;
+    // check if the current x and y values are within the provided parameter ranges of the correction tables
+    // if not, use the minimum and/or maximum x value determined based on the parameter ranges in SetXminmax()
+    if (!pi0) {
+        if (y > y_max)
+            y = y_max;
+        SetXminmax(y);
+        if (x < x_min)
+            x = x_min;
+        else if (x > x_max)
+            x = x_max;
+    }
 
     double weight = 1.;
     double correction = 0.;
