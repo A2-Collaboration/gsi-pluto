@@ -10,8 +10,6 @@ PRadiativeCorrectionsMuon::PRadiativeCorrectionsMuon(const Char_t *id, const Cha
 
     eta = etap = false;
 
-    //TODO: include pi0 corrections
-
     corrections_eta = new TGraph2D("eta_mumu_corrections", "Radiative Corrections #eta #to #mu^{+} #mu^{-} #gamma",
                                    eta_mumu::corr.size(), &eta_mumu::x[0], &eta_mumu::y[0], &eta_mumu::corr[0]);
     corrections_etap = new TGraph2D("etap_mumu_corrections", "Radiative Corrections #eta' #to #mu^{+} #mu^{-} #gamma",
@@ -30,13 +28,23 @@ void PRadiativeCorrectionsMuon::SetLimits()
 {
     TGraph2D* corr;
 
-    if (parent->GetParent()->Is("eta"))
+    if (parent->GetParent()->Is("eta")) {
         corr = corrections_eta;
-    else if (parent->GetParent()->Is("eta'"))
+        y_vals = &eta_mumu::y_vals;
+        x_tuples = &eta_mumu::x_tuples;
+        x_vec = &eta_mumu::x;
+        y_vec = &eta_mumu::y;
+        z_vec = &eta_mumu::corr;
+    } else if (parent->GetParent()->Is("eta'")) {
         corr = corrections_etap;
+        y_vals = &etap_mumu::y_vals;
+        x_tuples = &etap_mumu::x_tuples;
+        x_vec = &etap_mumu::x;
+        y_vec = &etap_mumu::y;
+        z_vec = &etap_mumu::corr;
+    }
 
     weight_max += corr->GetZmax()/100.;
-    x_min = corr->GetXmin();
 
     limits_set = true;
 }
@@ -47,46 +55,36 @@ Double_t PRadiativeCorrectionsMuon::GetWeight()
         SetLimits();
 
     meson = parent->GetParent();
-    eta = etap = false;
+    //eta = etap = false;
     if (!meson->IsMeson()) {
         Warning("GetWeight","Grandparent is not a meson");
         return 1.;
     }
-    if (meson->Is("eta"))
+    /*if (meson->Is("eta"))
         eta = true;
     else if (meson->Is("eta'"))
         etap = true;
     else {
         Warning("GetWeight","No pseudo-scalar meson found");
         return 1.;
-    }
+    }*/
 
     double x = parent->M2()/meson->M2();
     double y = meson->Vect4().Dot(lp->Vect4()-lm->Vect4());
     // use absolute value for y since y should be symmetric
     y = 2*abs(y)/meson->M2()/(1-x);
 
-    // check if the current x and y values are within the provided parameter ranges of the correction tables
-    // if not, use the minimum and/or maximum x value determined based on the parameter ranges in SetXminmax()
-    if (y > y_max)
-        y = y_max;
-    SetXminmax(y);
-    if (x < x_min)
-        x = x_min;
-    else if (x > x_max)
-        x = x_max;
-
     double weight = 1.;
-    double correction = 0.;
+    //double correction = 0.;
 
-    if (eta)
+    /*if (eta)
         correction = corrections_eta->Interpolate(x, y);
     else if (etap)
         correction = corrections_etap->Interpolate(x, y);
     else
-        Warning("GetWeight","No correction table found for this channel");
+        Warning("GetWeight","No correction table found for this channel");*/
 
-    weight += correction/100.;
+    weight += ApproximateValue(x, y)/100.;
 
     return weight;
 }
